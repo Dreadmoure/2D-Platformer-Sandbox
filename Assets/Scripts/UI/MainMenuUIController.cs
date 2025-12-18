@@ -11,9 +11,17 @@ namespace UI
         private Button _quitButton;
 
         private VisualElement _root;
+        
+        private InputTracker _inputTracker;
+        
+        private Action _unregisterNewGameButton;
+        private Action _unregisterQuitButton;
 
         private void OnEnable()
         {
+            ManagerRoot.Instance.InputTracker.Activate();
+            _inputTracker = ManagerRoot.Instance.InputTracker;
+            
             // Get the root of the UI document
             _root = GetComponent<UIDocument>().rootVisualElement;
             
@@ -31,9 +39,10 @@ namespace UI
             // Register click callbacks
             _newGameButton.clicked += OnNewGameClicked;
             _quitButton.clicked += OnQuitClicked;
-
-            // Optional: set initial keyboard/controller focus
-            _newGameButton.Focus();
+            
+            // Register input tracking
+            _unregisterNewGameButton = _inputTracker.RegisterElementForInputTracking(_newGameButton);
+            _unregisterQuitButton = _inputTracker.RegisterElementForInputTracking(_quitButton);
         }
         
         /// <summary>
@@ -41,10 +50,21 @@ namespace UI
         /// </summary>
         private void OnDisable()
         {
-            // Always unregister callbacks
+            ManagerRoot.Instance.InputTracker.Deactivate();
+            if (_newGameButton == null || _quitButton == null)
+                return;
+
             _newGameButton.clicked -= OnNewGameClicked;
             _quitButton.clicked -= OnQuitClicked;
+            
+            // Unregister input tracking
+            _unregisterNewGameButton?.Invoke();
+            _unregisterQuitButton?.Invoke();
         }
+        
+        // -------------------------
+        // Button callbacks
+        // -------------------------
         
         private void OnNewGameClicked()
         {

@@ -187,23 +187,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc3027d5f050a194e8728519752f0df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuUIController
---- !u!1 &357826976 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2259838539251485588, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
-  m_PrefabInstance: {fileID: 742001269}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &357826978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 357826976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e9002cf7e5ab84ca577b36092e2c5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Managers.Manager
 --- !u!1001 &742001269
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -256,22 +239,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7227373826943567663, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
-      propertyPath: scenes.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 7227373826943567663, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
-      propertyPath: 'scenes.Array.data[3]'
-      value: 
-      objectReference: {fileID: 102900000, guid: fe69ffa5c9b736d4c982d442f79f9dd0, type: 3}
-    m_RemovedComponents:
-    - {fileID: 9007704668452581812, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2259838539251485588, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 357826978}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
 --- !u!1 &1135575679
 GameObject:
@@ -289,7 +260,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1135575680
 MonoBehaviour:
   m_ObjectHideFlags: 0

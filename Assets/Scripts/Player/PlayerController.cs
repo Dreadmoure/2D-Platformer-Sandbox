@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -164,5 +165,13 @@ namespace Player
             return hitLeft.collider != null || hitRight.collider != null;
         }
         
+        // This method will be called by the Input System "Pause" action
+        public void OnPause(InputValue value)
+        {
+            if (!value.isPressed) return; // only act on press
+
+            // Toggle pause through the GamePauseManager
+            ManagerRoot.Instance.GamePauseManager.TogglePause();
+        }
     }
 }

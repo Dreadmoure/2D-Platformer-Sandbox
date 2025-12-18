@@ -1,77 +1,88 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Managers
 {
     public class GameSceneManager : MonoBehaviour
     {
-        [SerializeField] private List<SceneAsset> scenes;
+        [SerializeField] private SceneAsset mainMenuScene;
+        
+        [SerializeField] private List<SceneAsset> gameScenes;
+        
+        [SerializeField] private SceneAsset gameOverMenuScene;
 
         private int _currentSceneIndex;
-        
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
-            var activeSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-            _currentSceneIndex = scenes.FindIndex(
-                s => s.name == activeSceneName
-            );
+        public void LoadMainMenuScene()
+        {
+            if (mainMenuScene == null)
+            {
+                Debug.LogError("No SceneAsset assigned in Main Menu Scene field");
+                return;
+            }
+            
+            SceneManager.LoadScene(mainMenuScene.name);
         }
 
         /// <summary>
-        /// Loads the next scene on the scenes list
+        /// Loads the next scene on the gameScenes list if there are none, go to gameover menu scene
         /// </summary>
         public void LoadNextScene()
         {
-            if (_currentSceneIndex < 0)
+            if (gameScenes == null || gameScenes.Count == 0)
             {
-                Debug.LogError("Current scene not found in scene list.");
+                Debug.LogError("Game scenes list is empty.");
                 return;
             }
-
-            if (_currentSceneIndex + 1 >= scenes.Count)
+            
+            // Not currently in a game scene → start game
+            if (_currentSceneIndex < 0)
             {
-                Debug.Log("No more scenes to load.");
+                _currentSceneIndex = 0;
+                SceneManager.LoadScene(gameScenes[0].name);
+                return;
+            }
+            
+            // Already in a game scene → move forward
+            if (_currentSceneIndex + 1 >= gameScenes.Count)
+            {
+                LoadGameOverMenuScene();
                 return;
             }
 
             _currentSceneIndex++;
-            UnityEngine.SceneManagement.SceneManager.LoadScene(scenes[_currentSceneIndex].name);
+            SceneManager.LoadScene(gameScenes[_currentSceneIndex].name);
         }
 
         /// <summary>
         /// Load a specific scene based on the index of scenes list
         /// </summary>
         /// <param name="index">index on scenes list starting from 0</param>
-        public void LoadScene(int index)
+        public void LoadGameScene(int index)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(index);
+            SceneManager.LoadScene(gameScenes[index].name);
         }
 
-        /// <summary>
-        /// Loads the first scene on the list
-        /// </summary>
-        public void LoadFirstScene()
+        public void LoadGameOverMenuScene()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            SceneManager.LoadScene(gameOverMenuScene.name);
+        }
+        
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        /// <summary>
-        /// Loads the last scene on the list
-        /// </summary>
-        public void LoadLastScene()
+        private void OnDisable()
         {
-            if (scenes?.Count > 0)
-            {
-                _currentSceneIndex = scenes.Count - 1;
-                UnityEngine.SceneManagement.SceneManager.LoadScene(scenes[_currentSceneIndex].name);
-            }
-            else
-            {
-                Debug.LogError("Scenes list is empty.");
-            }
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            _currentSceneIndex = gameScenes.FindIndex(s => s.name == scene.name);
         }
     }
 }
