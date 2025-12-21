@@ -13,21 +13,12 @@ namespace Managers
         private bool _isPaused;
         
         public bool IsPaused => _isPaused;
-        
-        [Header("Non-pausable Scenes (assign in Inspector)")]
-        [SerializeField] private List<SceneAsset> nonPausableSceneAssets = new List<SceneAsset>();
-        
-        private List<string> _nonPausableSceneNames = new List<string>();
-        
+
+        private HashSet<string> _nonPausableSceneNames;
+
         private void Awake()
         {
-            // Convert SceneAssets to names for runtime checks
-            _nonPausableSceneNames.Clear();
-            foreach (var sceneAsset in nonPausableSceneAssets)
-            {
-                if (sceneAsset != null)
-                    _nonPausableSceneNames.Add(sceneAsset.name);
-            }
+            _nonPausableSceneNames = new HashSet<string>(ManagerRoot.Instance.GameSceneManager.GetNonPausableScenesByName()); 
             
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -67,6 +58,12 @@ namespace Managers
         
         private bool CanPauseInScene(string sceneName)
         {
+            if (_nonPausableSceneNames == null)
+            {
+                Debug.LogWarning("GamePauseManager: Non-pausable scenes not initialized yet.");
+                return false; // safest default
+            }
+
             return !_nonPausableSceneNames.Contains(sceneName);
         }
         

@@ -14,6 +14,33 @@ namespace Managers
         [SerializeField] private SceneAsset gameOverMenuScene;
 
         private int _currentSceneIndex;
+        
+        public string GetMainMenuSceneName() => mainMenuScene?.name;
+        public string GetGameOverMenuSceneName() => gameOverMenuScene?.name;
+        public List<string> GetGameSceneNames()
+        {
+            var names = new List<string>();
+            foreach (var s in gameScenes)
+            {
+                if (s != null) names.Add(s.name);
+            }
+            return names;
+        }
+        
+        private void Awake()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            _currentSceneIndex = gameScenes.FindIndex(s => s.name == scene.name);
+        }
 
         public void LoadMainMenuScene()
         {
@@ -22,7 +49,7 @@ namespace Managers
                 Debug.LogError("No SceneAsset assigned in Main Menu Scene field");
                 return;
             }
-            
+
             SceneManager.LoadScene(mainMenuScene.name);
         }
 
@@ -36,16 +63,14 @@ namespace Managers
                 Debug.LogError("Game scenes list is empty.");
                 return;
             }
-            
-            // Not currently in a game scene → start game
+
             if (_currentSceneIndex < 0)
             {
                 _currentSceneIndex = 0;
                 SceneManager.LoadScene(gameScenes[0].name);
                 return;
             }
-            
-            // Already in a game scene → move forward
+
             if (_currentSceneIndex + 1 >= gameScenes.Count)
             {
                 LoadGameOverMenuScene();
@@ -62,27 +87,49 @@ namespace Managers
         /// <param name="index">index on scenes list starting from 0</param>
         public void LoadGameScene(int index)
         {
+            if (index < 0 || index >= gameScenes.Count)
+            {
+                Debug.LogError($"Invalid scene index: {index}");
+                return;
+            }
+
             SceneManager.LoadScene(gameScenes[index].name);
         }
 
         public void LoadGameOverMenuScene()
         {
+            if (gameOverMenuScene == null)
+            {
+                Debug.LogError("No SceneAsset assigned in Game Over Menu Scene field");
+                return;
+            }
+
             SceneManager.LoadScene(gameOverMenuScene.name);
         }
-        
-        private void OnEnable()
-        {
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
 
-        private void OnDisable()
+        public List<string> GetNonPausableScenesByName()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
-        
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            _currentSceneIndex = gameScenes.FindIndex(s => s.name == scene.name);
+            var result = new List<string>();
+
+            if (mainMenuScene != null)
+            {
+                result.Add(mainMenuScene.name);
+            }
+            else
+            {
+                Debug.LogWarning("Main Menu Scene is not assigned.");
+            }
+            
+            if (gameOverMenuScene != null)
+            {
+                result.Add(gameOverMenuScene.name);
+            }
+            else
+            {
+                Debug.LogWarning("Game Over Menu Scene is not assigned.");
+            }
+            
+            return result;
         }
     }
 }
