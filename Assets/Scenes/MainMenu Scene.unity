@@ -119,6 +119,20 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &604596566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Player/Pause
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 4c506fdc3662b0946b44528535de8a38, type: 3}
+  m_ActionId: caa7d481-ff60-4509-abb9-a72826361c01
 --- !u!1001 &742001269
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127,6 +141,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 175485090485944104, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
+      propertyPath: pauseAction
+      value: 
+      objectReference: {fileID: 604596566}
     - target: {fileID: 2259838539251485588, guid: 78053a3b08dc7394f8b356405a77a195, type: 3}
       propertyPath: m_Name
       value: Managers

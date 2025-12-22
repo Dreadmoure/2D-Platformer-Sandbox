@@ -17,25 +17,22 @@ namespace Managers
             MouseKeyboard,
             Controller
         }
-        
-        [Header("Scene Configuration")]
-        [Tooltip("Scenes where the cursor should always be visible.")]
-        [SerializeField] private List<SceneAsset> cursorAlwaysVisibleScenes;
-        
+
         public InputType LastInputType { get; private set; } = InputType.MouseKeyboard;
-        public bool IsActive { get; private set; } = false;
-        
+        public bool IsActive { get; private set; }
+
+        private HashSet<string> _cursorVisibleScenes;
         private Vector2 _lastMousePosition;
-        private bool _allowCursorHide = true; // Controlled by scene
+        private bool _allowCursorHide = true;
         
         private void Awake()
         {
             if (Mouse.current != null)
                 _lastMousePosition = Mouse.current.position.ReadValue();
-
-            ApplyCursorVisibility();
+            
+            _cursorVisibleScenes = new HashSet<string>(ManagerRoot.Instance.GameSceneManager.GetNonPausableScenesByName());
         }
-        
+
         private void OnEnable()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -48,18 +45,8 @@ namespace Managers
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // Cursor can hide in all scenes EXCEPT the ones on the list
-            _allowCursorHide = true;
-            foreach (var sceneAsset in cursorAlwaysVisibleScenes)
-            {
-                if (sceneAsset != null && scene.name == sceneAsset.name)
-                {
-                    _allowCursorHide = false;
-                    break;
-                }
-            }
+            _allowCursorHide = !_cursorVisibleScenes.Contains(scene.name);
 
-            // Reset input type to Controller if hiding is allowed
             if (_allowCursorHide)
                 LastInputType = InputType.Controller;
 
@@ -75,18 +62,7 @@ namespace Managers
         public void Deactivate()
         {
             IsActive = false;
-
-            // Hide cursor if the scene allows hiding
-            if (_allowCursorHide)
-            {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.None; // hidden and free
-            }
-            else
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None; // visible
-            }
+            ApplyCursorVisibility();
         }
         
         private void Update()
@@ -98,7 +74,6 @@ namespace Managers
             if (Mouse.current != null)
             {
                 Vector2 currentMousePos = Mouse.current.position.ReadValue();
-
                 if (currentMousePos != _lastMousePosition)
                 {
                     _lastMousePosition = currentMousePos;
@@ -111,7 +86,7 @@ namespace Managers
             {
                 SetMouseKeyboardInput();
             }
-
+        
             // Controller input
             if (Gamepad.current != null)
             {
@@ -126,9 +101,6 @@ namespace Managers
             }
         }
         
-        // -------------------------
-        // Public API (called by UI / gameplay)
-        // -------------------------
         public void SetMouseKeyboardInput()
         {
             if (LastInputType == InputType.MouseKeyboard) return;
@@ -141,56 +113,18 @@ namespace Managers
         {
             if (LastInputType == InputType.Controller) return;
 
-            // Save last visible mouse position before hiding
-            if (Mouse.current != null)
-                _lastMousePosition = Mouse.current.position.ReadValue();
-
             LastInputType = InputType.Controller;
             ApplyCursorVisibility();
         }
         
-        public void ApplyCursorVisibility()
+        private void ApplyCursorVisibility()
         {
-            if (!_allowCursorHide || LastInputType == InputType.MouseKeyboard)
-            {
-                // Cursor always visible in these scenes, or last input is mouse/keyboard
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None; // show and free
-            }
-            else
-            {
-                // Cursor hidden in scenes that allow hiding, and last input was controller
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.None; // hide and free
-            }
-        }
-        
-        // Registers all relevant callbacks on a VisualElement (Button, etc.)
-        // Returns an Action that will unregister all of them
-        public Action RegisterElementForInputTracking(VisualElement element)
-        {
-            EventCallback<PointerEnterEvent> pointerEnterHandler = _ =>
-            {
-                SetMouseKeyboardInput();
-                element.Focus();
-            };
-            EventCallback<PointerDownEvent> pointerDownHandler = _ => SetMouseKeyboardInput();
-            EventCallback<NavigationMoveEvent> navigationMoveHandler = _ => SetControllerInput();
-            EventCallback<NavigationSubmitEvent> navigationSubmitHandler = _ => SetControllerInput();
+            bool isPaused = ManagerRoot.Instance.GamePauseManager?.IsPaused ?? false;
 
-            element.RegisterCallback(pointerEnterHandler);
-            element.RegisterCallback(pointerDownHandler);
-            element.RegisterCallback(navigationMoveHandler);
-            element.RegisterCallback(navigationSubmitHandler);
+            bool shouldShow = !_allowCursorHide || isPaused;
 
-            // Return an Action to unregister all callbacks
-            return () =>
-            {
-                element.UnregisterCallback(pointerEnterHandler);
-                element.UnregisterCallback(pointerDownHandler);
-                element.UnregisterCallback(navigationMoveHandler);
-                element.UnregisterCallback(navigationSubmitHandler);
-            };
+            Cursor.visible = shouldShow;
+            Cursor.lockState = CursorLockMode.None; // never lock
         }
     }
 }

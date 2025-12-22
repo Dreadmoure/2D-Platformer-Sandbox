@@ -7,23 +7,14 @@ namespace UI
 {
     public class GameOverMenuUIController : MonoBehaviour
     {
+        private VisualElement _root;
+        
         private Button _retryButton;
         private Button _backToMainMenuButton;
         private Button _quitButton;
-
-        private VisualElement _root;
-        
-        private InputTracker _inputTracker;
-        
-        private Action _unregisterRetryButton;
-        private Action _unregisterBackToMainMenuButton;
-        private Action _unregisterQuitButton;
     
         private void OnEnable()
         {
-            ManagerRoot.Instance.InputTracker.Activate();
-            _inputTracker = ManagerRoot.Instance.InputTracker;
-            
             // Get the root of the UI document
             _root = GetComponent<UIDocument>().rootVisualElement;
             
@@ -32,10 +23,11 @@ namespace UI
             _backToMainMenuButton = _root.Q<Button>("BackToMainMenuButton");
             _quitButton = _root.Q<Button>("QuitButton");
             
-            // Safety checks
-            if (_retryButton == null || _backToMainMenuButton == null || _quitButton == null)
+            if (_retryButton == null ||
+                _backToMainMenuButton == null ||
+                _quitButton == null)
             {
-                Debug.LogError("GameOverMenuUIController: Button not found in UXML.");
+                Debug.LogError("GameOverMenuUIController: One or more buttons not found in UXML.");
                 return;
             }
 
@@ -43,11 +35,6 @@ namespace UI
             _retryButton.clicked += OnRetryClicked;
             _backToMainMenuButton.clicked += OnBackToMainMenuClicked;
             _quitButton.clicked += OnQuitClicked;
-            
-            // Register input tracking
-            _unregisterRetryButton = _inputTracker.RegisterElementForInputTracking(_retryButton);
-            _unregisterBackToMainMenuButton = _inputTracker.RegisterElementForInputTracking(_backToMainMenuButton);
-            _unregisterQuitButton = _inputTracker.RegisterElementForInputTracking(_quitButton);
         }
         
         /// <summary>
@@ -55,16 +42,14 @@ namespace UI
         /// </summary>
         private void OnDisable()
         {
-            ManagerRoot.Instance.InputTracker.Deactivate();
+            if (_retryButton != null)
+                _retryButton.clicked -= OnRetryClicked;
 
-            _retryButton.clicked -= OnRetryClicked;
-            _backToMainMenuButton.clicked -= OnBackToMainMenuClicked;
-            _quitButton.clicked -= OnQuitClicked;
-            
-            // Unregister input tracking
-            _unregisterRetryButton?.Invoke();
-            _unregisterBackToMainMenuButton?.Invoke();
-            _unregisterQuitButton?.Invoke();
+            if (_backToMainMenuButton != null)
+                _backToMainMenuButton.clicked -= OnBackToMainMenuClicked;
+
+            if (_quitButton != null)
+                _quitButton.clicked -= OnQuitClicked;
         }
         
         private void OnRetryClicked()

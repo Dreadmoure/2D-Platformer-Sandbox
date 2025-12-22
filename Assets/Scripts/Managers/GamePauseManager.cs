@@ -10,14 +10,18 @@ namespace Managers
     {
         public event Action<bool> OnPauseToggled;
         
-        private bool _isPaused;
-        
         public bool IsPaused => _isPaused;
+        
+        private bool _isPaused;
 
         private HashSet<string> _nonPausableSceneNames;
+        
+        private InputTracker _inputTracker;
 
         private void Awake()
         {
+            _inputTracker = ManagerRoot.Instance.InputTracker;
+            
             _nonPausableSceneNames = new HashSet<string>(ManagerRoot.Instance.GameSceneManager.GetNonPausableScenesByName()); 
             
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -30,53 +34,51 @@ namespace Managers
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // Safety: never stay paused in a non-pausable scene
             if (!CanPauseInScene(scene.name))
                 ForceUnpause();
         }
         
         public void TogglePause()
         {
-            if (!CanPause()) return;
-
-            _isPaused = !_isPaused;
-            Time.timeScale = _isPaused ? 0f : 1f;
-
-            // Activate or deactivate InputTracker depending on pause state
-            if (_isPaused)
-                ManagerRoot.Instance.InputTracker?.Activate();
-            else
-                ManagerRoot.Instance.InputTracker?.Deactivate();
-
-            OnPauseToggled?.Invoke(_isPaused);
-        }
-        
-        public bool CanPause()
-        {
-            string sceneName = SceneManager.GetActiveScene().name;
-            return CanPauseInScene(sceneName);
-        }
-        
-        private bool CanPauseInScene(string sceneName)
-        {
-            if (_nonPausableSceneNames == null)
+            if (!CanPause())
             {
-                Debug.LogWarning("GamePauseManager: Non-pausable scenes not initialized yet.");
-                return false; // safest default
+                return;
             }
 
-            return !_nonPausableSceneNames.Contains(sceneName);
+            SetPaused(!_isPaused);
         }
         
         public void ForceUnpause()
         {
-            if (!_isPaused) return;
-            _isPaused = false;
-            Time.timeScale = 1f;
-            
-            ManagerRoot.Instance.InputTracker?.Deactivate();
-            ManagerRoot.Instance.InputTracker?.ApplyCursorVisibility(); // force correct cursor
-            
-            OnPauseToggled?.Invoke(false);
+            if (!_isPaused)
+                return;
+
+            SetPaused(false);
+        }
+        
+        public bool CanPause()
+        {
+            return CanPauseInScene(SceneManager.GetActiveScene().name);
+        }
+        
+        private void SetPaused(bool paused)
+        {
+            _isPaused = paused;
+            Time.timeScale = paused ? 0f : 1f;
+
+            if (paused)
+                _inputTracker.Activate();
+            else
+                _inputTracker.Deactivate();
+
+            OnPauseToggled?.Invoke(paused);
+        }
+        
+        private bool CanPauseInScene(string sceneName)
+        {
+            // Non-pausable scenes are explicitly listed
+            return !_nonPausableSceneNames.Contains(sceneName);
         }
     }
 }

@@ -7,89 +7,64 @@ namespace UI
 {
     public class PauseMenuUIController : MonoBehaviour
     {
+        private VisualElement _root;
+        private VisualElement _pauseMenuPanel;
+        
         private Button _resumeButton;
         private Button _backToMainMenuButton;
         private Button _quitButton;
-
-        private VisualElement _pauseMenuPanel;
-        
-        private VisualElement _root;
-        
-        private InputTracker _inputTracker;
-        
-        private Action _unregisterResumeButton;
-        private Action _unregisterBackToMainMenuButton;
-        private Action _unregisterQuitButton;
         
         private void OnEnable()
         {
-            ManagerRoot.Instance.InputTracker.Activate();
-            _inputTracker = ManagerRoot.Instance.InputTracker;
-            
             // Get the root of the UI document
             _root = GetComponent<UIDocument>().rootVisualElement;
             
-            // Query buttons by name
+            // Query UI elements
+            _pauseMenuPanel = _root.Q<VisualElement>("PauseMenuPanel");
             _resumeButton = _root.Q<Button>("ResumeButton");
             _backToMainMenuButton = _root.Q<Button>("BackToMainMenuButton");
             _quitButton = _root.Q<Button>("QuitButton");
             
-            // Pause menu panel
-            _pauseMenuPanel = _root.Q<VisualElement>("PauseMenuPanel");
-            TogglePausePanel(false);
-            
-            // Safety checks
-            if (_resumeButton == null || _backToMainMenuButton == null || _quitButton == null)
+            if (_pauseMenuPanel == null ||
+                _resumeButton == null ||
+                _backToMainMenuButton == null ||
+                _quitButton == null)
             {
-                Debug.LogError("PauseMenuUIController: Button not found in UXML.");
+                Debug.LogError("PauseMenuUIController: One or more UI elements not found in UXML.");
                 return;
             }
 
-            // Register click callbacks
+            // Button callbacks
             _resumeButton.clicked += OnResumeClicked;
             _backToMainMenuButton.clicked += OnBackToMainMenuClicked;
             _quitButton.clicked += OnQuitClicked;
             
-            // Register input tracking
-            _unregisterResumeButton = _inputTracker.RegisterElementForInputTracking(_resumeButton);
-            _unregisterBackToMainMenuButton = _inputTracker.RegisterElementForInputTracking(_backToMainMenuButton);
-            _unregisterQuitButton = _inputTracker.RegisterElementForInputTracking(_quitButton);
-            
             // Subscribe to pause toggled event
-            ManagerRoot.Instance.GamePauseManager.OnPauseToggled += TogglePausePanel;
+            ManagerRoot.Instance.GamePauseManager.OnPauseToggled += OnPauseToggled;
+            
+            // Sync initial state
+            OnPauseToggled(ManagerRoot.Instance.GamePauseManager.IsPaused);
         }
         
         private void OnDisable()
         {
-            ManagerRoot.Instance.InputTracker.Deactivate();
+            if (ManagerRoot.Instance?.GamePauseManager != null)
+                ManagerRoot.Instance.GamePauseManager.OnPauseToggled -= OnPauseToggled;
 
-            _resumeButton.clicked -= OnResumeClicked;
-            _backToMainMenuButton.clicked -= OnBackToMainMenuClicked;
-            _quitButton.clicked -= OnQuitClicked;
-            
-            // Unregister input tracking
-            _unregisterResumeButton?.Invoke();
-            _unregisterBackToMainMenuButton?.Invoke();
-            _unregisterQuitButton?.Invoke();
-            
-            // Unsubscribe from pause toggled event
-            if (ManagerRoot.Instance.GamePauseManager != null)
-                ManagerRoot.Instance.GamePauseManager.OnPauseToggled -= TogglePausePanel;
+            if (_resumeButton != null)
+                _resumeButton.clicked -= OnResumeClicked;
+
+            if (_backToMainMenuButton != null)
+                _backToMainMenuButton.clicked -= OnBackToMainMenuClicked;
+
+            if (_quitButton != null)
+                _quitButton.clicked -= OnQuitClicked;
         }
 
-        private void TogglePausePanel(bool isActive)
+        private void OnPauseToggled(bool isPaused)
         {
-            if (_pauseMenuPanel == null || _inputTracker == null)
-                return;
-
-            // Show/hide panel
-            _pauseMenuPanel.style.display = isActive ? DisplayStyle.Flex : DisplayStyle.None;
-
-            // Activate/deactivate InputTracker
-            if (isActive)
-                _inputTracker.Activate();
-            else
-                _inputTracker.Deactivate();
+            _pauseMenuPanel.style.display =
+                isPaused ? DisplayStyle.Flex : DisplayStyle.None;
         }
         
         private void OnResumeClicked()
