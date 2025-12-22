@@ -735,6 +735,8 @@ MonoBehaviour:
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1
+  musicClipsList: []
+  sfxClipsList: []
 --- !u!1 &8427680773414427242
 GameObject:
   m_ObjectHideFlags: 0
