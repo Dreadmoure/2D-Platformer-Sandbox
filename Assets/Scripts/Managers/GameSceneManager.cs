@@ -49,7 +49,7 @@ namespace Managers
                 Debug.LogError("No SceneAsset assigned in Main Menu Scene field");
                 return;
             }
-
+            
             SceneManager.LoadScene(mainMenuScene.name);
         }
 

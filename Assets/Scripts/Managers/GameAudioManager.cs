@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 namespace Managers
@@ -25,6 +26,8 @@ namespace Managers
         
         public enum SfxType
         {
+            MenuNavigate,
+            MenuSelect,
             Jump
             // Add more as needed
         }
@@ -36,43 +39,43 @@ namespace Managers
         [SerializeField] private List<SfxTypeClipPair> sfxClipsList;
         
         // Internal dictionaries
-        private Dictionary<MusicType, AudioClip> _musicClips;
-        private Dictionary<SfxType, AudioClip> _sfxClips;
+        private Dictionary<MusicType, (AudioClip clip, float volume)> _musicClips;
+        private Dictionary<SfxType, (AudioClip clip, float volume)> _sfxClips;
         
-        private AudioClip _currentMusic;
+        private AudioClip _currentMusicClip;
+        private MusicType _currentMusicType;
         
-        // -------------------------
-        // Structs for inspector assignment
-        // -------------------------
         [System.Serializable]
-        public struct MusicTypeClipPair
+        public class MusicTypeClipPair
         {
             public MusicType type;
             public AudioClip clip;
+            [Range(0f, 1f)] public float volume = 1;
         }
         
         [System.Serializable]
-        public struct SfxTypeClipPair
+        public class SfxTypeClipPair
         {
             public SfxType type;
             public AudioClip clip;
+            [Range(0f, 1f)] public float volume = 1;
         }
         
         private void Awake()
         {
             // Build dictionaries for fast lookup
-            _musicClips = new Dictionary<MusicType, AudioClip>();
+            _musicClips = new Dictionary<MusicType, (AudioClip clip, float volume)>();
             foreach (var pair in musicClipsList)
             {
                 if (pair.clip != null && !_musicClips.ContainsKey(pair.type))
-                    _musicClips.Add(pair.type, pair.clip);
+                    _musicClips.Add(pair.type, (pair.clip, pair.volume));
             }
-            
-            _sfxClips = new Dictionary<SfxType, AudioClip>();
+
+            _sfxClips = new Dictionary<SfxType, (AudioClip clip, float volume)>();
             foreach (var pair in sfxClipsList)
             {
                 if (pair.clip != null && !_sfxClips.ContainsKey(pair.type))
-                    _sfxClips.Add(pair.type, pair.clip);
+                    _sfxClips.Add(pair.type, (pair.clip, pair.volume));
             }
             
             if (musicSource == null || sfxSource == null)
@@ -84,32 +87,56 @@ namespace Managers
             // Ensure music source loops
             musicSource.loop = true;
 
-            ApplyVolumes();
+            ApplyGlobalVolumes();
+            
+            // Play initial music for the current scene
+            PlayMusicForCurrentScene();
+            
+            // Subscribe to scene changes
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            PlayMusicForCurrentScene();
         }
 
-        private void PlayMusic(AudioClip clip, bool restartIfSame = false)
+        
+        private void PlayMusicForCurrentScene()
         {
-            if (clip == null) return;
+            var activeScene = SceneManager.GetActiveScene().name;
 
-            if (_currentMusic == clip && musicSource.isPlaying && !restartIfSame) return;
-
-            _currentMusic = clip;
-            musicSource.clip = clip;
-            musicSource.Play();
+            if (activeScene == ManagerRoot.Instance.GameSceneManager.GetMainMenuSceneName())
+                PlayMusic(MusicType.MainMenu);
+            else if (activeScene == ManagerRoot.Instance.GameSceneManager.GetGameOverMenuSceneName())
+                PlayMusic(MusicType.GameOver);
+            else
+                PlayMusic(MusicType.Game); // default for in-game scenes
         }
         
         public void PlayMusic(MusicType type, bool restartIfSame = false)
         {
-            if (_musicClips.TryGetValue(type, out AudioClip clip))
-                PlayMusic(clip, restartIfSame);
-            else
+            if (!_musicClips.TryGetValue(type, out var entry))
+            {
                 Debug.LogWarning($"MusicType {type} has no clip assigned.");
+                return;
+            }
+
+            if (_currentMusicClip == entry.clip && musicSource.isPlaying && !restartIfSame)
+                return;
+
+            _currentMusicClip = entry.clip;
+            _currentMusicType = type;
+
+            musicSource.clip = entry.clip;
+            musicSource.volume = entry.volume * musicVolume * masterVolume;
+            musicSource.Play();
         }
         
         public void StopMusic()
         {
             musicSource.Stop();
-            _currentMusic = null;
+            _currentMusicClip = null;
         }
 
         public void PauseMusic()
@@ -120,21 +147,41 @@ namespace Managers
         {
             musicSource.UnPause();
         }
-
-        private void PlaySfx(AudioClip clip)
+        
+        private void UpdateMusicVolume()
         {
-            if (clip == null)
-                return;
+            if (_currentMusicClip != null && _musicClips.TryGetValue(_currentMusicType, out var entry))
+                musicSource.volume = entry.volume * musicVolume * masterVolume;
+        }
+        
+        // Update per-clip music volume live
+        public void UpdateMusicClipVolume(MusicType type, float newVolume)
+        {
+            if (_musicClips.TryGetValue(type, out var entry))
+            {
+                _musicClips[type] = (entry.clip, Mathf.Clamp01(newVolume));
 
-            sfxSource.PlayOneShot(clip, sfxVolume * masterVolume);
+                // If currently playing, apply immediately
+                if (_currentMusicType == type && _currentMusicClip == entry.clip)
+                    UpdateMusicVolume();
+            }
         }
         
         public void PlaySfx(SfxType type)
         {
-            if (_sfxClips.TryGetValue(type, out AudioClip clip))
-                PlaySfx(clip);
-            else
+            if (!_sfxClips.TryGetValue(type, out var entry))
+            {
                 Debug.LogWarning($"SFXType {type} has no clip assigned.");
+                return;
+            }
+
+            sfxSource.PlayOneShot(entry.clip, entry.volume * sfxVolume * masterVolume);
+        }
+        
+        public void UpdateSfxClipVolume(SfxType type, float newVolume)
+        {
+            if (_sfxClips.TryGetValue(type, out var entry))
+                _sfxClips[type] = (entry.clip, Mathf.Clamp01(newVolume));
         }
         
         public void StopAllSfx()
@@ -142,31 +189,57 @@ namespace Managers
             sfxSource.Stop();
         }
 
+        #region Global Volumes
+        
         public void SetMasterVolume(float value)
         {
             masterVolume = Mathf.Clamp01(value);
-            ApplyVolumes();
+            ApplyGlobalVolumes();
         }
         
         public void SetMusicVolume(float value)
         {
             musicVolume = Mathf.Clamp01(value);
-            ApplyVolumes();
+            if (_currentMusicClip != null)
+                UpdateMusicClipVolume(_currentMusicType, _musicClips[_currentMusicType].volume);
         }
         
         public void SetSfxVolume(float value)
         {
             sfxVolume = Mathf.Clamp01(value);
-            ApplyVolumes();
         }
         
-        private void ApplyVolumes()
+        private void ApplyGlobalVolumes()
         {
-            if (musicSource != null)
-                musicSource.volume = musicVolume * masterVolume;
+            // Only affects currently playing music
+            UpdateMusicVolume();
+        }
 
-            if (sfxSource != null)
-                sfxSource.volume = sfxVolume * masterVolume;
+        #endregion
+        
+        
+        /// <summary>
+        /// Runs when an inspector item is changed
+        /// </summary>
+        private void OnValidate()
+        {
+            // Only try to update if dictionaries exist
+            if (_musicClips != null && _currentMusicClip != null)
+                UpdateMusicVolume();
+
+            if (_musicClips != null && musicClipsList != null)
+            {
+                foreach (var pair in musicClipsList)
+                    UpdateMusicClipVolume(pair.type, pair.volume);
+            }
+
+            if (_sfxClips != null && sfxClipsList != null)
+            {
+                foreach (var pair in sfxClipsList)
+                    UpdateSfxClipVolume(pair.type, pair.volume);
+            }
+
+            ApplyGlobalVolumes();
         }
     }
 }

@@ -30,6 +30,10 @@ namespace UI
             // Register click callbacks
             _newGameButton.clicked += OnNewGameClicked;
             _quitButton.clicked += OnQuitClicked;
+            
+            // Hover / navigation sounds
+            RegisterHoverSounds(_newGameButton);
+            RegisterHoverSounds(_quitButton);
         }
         
         /// <summary>
@@ -44,13 +48,26 @@ namespace UI
                 _quitButton.clicked -= OnQuitClicked;
         }
         
+        private void RegisterHoverSounds(Button button)
+        {
+            button.RegisterCallback<PointerEnterEvent>(_ => PlayNavigateSound());
+            button.RegisterCallback<FocusEvent>(_ => PlayNavigateSound());
+        }
+
+        private void PlayNavigateSound()
+        {
+            ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.MenuNavigate);
+        }
+        
         private void OnNewGameClicked()
         {
+            ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.MenuSelect);
             ManagerRoot.Instance.GameSceneManager.LoadNextScene();
         }
 
         private void OnQuitClicked()
         {
+            ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.MenuSelect);
             Application.Quit();
         }
     }

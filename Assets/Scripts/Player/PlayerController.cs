@@ -95,6 +95,9 @@ namespace Player
             if (_jumpBufferCounter > 0f && _coyoteTimeCounter > 0f)
             {
                 Jump(jumpForce);
+                
+                ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.Jump);
+                
                 _isDoubleJumping = false;
                 _jumpStarted = true;
 
@@ -105,6 +108,9 @@ namespace Player
             else if (canDoubleJump && !_hasDoubleJumped && _jumpQueued)
             {
                 Jump(doubleJumpForce);
+                
+                ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.Jump);
+                
                 _hasDoubleJumped = true;
                 _isDoubleJumping = true;
                 _jumpStarted = true;
