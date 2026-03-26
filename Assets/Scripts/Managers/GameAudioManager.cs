@@ -88,12 +88,6 @@ namespace Managers
             musicSource.loop = true;
 
             ApplyGlobalVolumes();
-            
-            // Play initial music for the current scene
-            PlayMusicForCurrentScene();
-            
-            // Subscribe to scene changes
-            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -101,7 +95,16 @@ namespace Managers
             PlayMusicForCurrentScene();
         }
 
-        
+        private void Start()
+        {
+            // Play initial music for the current scene
+            PlayMusicForCurrentScene();
+
+            // Subscribe to scene changes
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+
         private void PlayMusicForCurrentScene()
         {
             var activeScene = SceneManager.GetActiveScene().name;
