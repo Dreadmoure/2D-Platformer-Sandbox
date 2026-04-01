@@ -28,7 +28,8 @@ namespace Managers
         {
             MenuNavigate,
             MenuSelect,
-            Jump
+            Jump,
+            CollectablePickup
             // Add more as needed
         }
         
@@ -58,7 +59,7 @@ namespace Managers
         {
             public SfxType type;
             public AudioClip clip;
-            [Range(0f, 1f)] public float volume = 1;
+            [Range(0f, 2f)] public float volume = 1;
         }
         
         private void Awake()

@@ -1,3 +1,4 @@
+using System;
 using Managers;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -39,10 +40,17 @@ namespace Player
         // Timing
         private float _coyoteTimeCounter;
         private float _jumpBufferCounter;
+        
+        // Animator
+        private Animator _anim;
+        
+        public CollectableHandler CollectableHandler { get; private set; }
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+            _anim = GetComponent<Animator>();
+            CollectableHandler = gameObject.GetComponent<CollectableHandler>();
         }
     
         public void OnMove(InputValue value)
@@ -63,7 +71,24 @@ namespace Player
                 _jumpHeld = false;
             }
         }
-    
+
+        private void Update()
+        {
+            // Update animation
+            _anim.SetFloat("Speed", Mathf.Abs(_moveInput.x));
+            _anim.SetBool("IsGrounded", IsGrounded());
+            
+            // Rotate player so the sprite turns the correct way
+            if (_moveInput.x > 0.01f)
+            {
+                transform.localScale = new Vector3(1, 1, 1);
+            }
+            else if (_moveInput.x < -0.01f)
+            {
+                transform.localScale = new Vector3(-1, 1, 1);
+            }
+        }
+
         private void FixedUpdate()
         {
             // Horizontal movement
@@ -145,6 +170,7 @@ namespace Player
         private void Move()
         {
             _rb.linearVelocity = new Vector2(_moveInput.x * speed, _rb.linearVelocity.y);
+                
         }
         
         private void Jump(float force)
@@ -154,12 +180,12 @@ namespace Player
 
         private bool IsGrounded()
         {
-            float rayLength = 0.2f;
+            float rayLength = 0.1f;
             
             Vector2 feetPos = (Vector2)transform.position + Vector2.down * 0.5f; // adjust 0.5f to match half player height
             
-            Vector2 leftRay = feetPos + Vector2.left * 0.4f;
-            Vector2 rightRay = feetPos + Vector2.right * 0.4f;
+            Vector2 leftRay = feetPos + Vector2.left * 0.2f;
+            Vector2 rightRay = feetPos + Vector2.right * 0.2f;
 
             RaycastHit2D hitLeft = Physics2D.Raycast(leftRay, Vector2.down, rayLength, groundLayer);
             RaycastHit2D hitRight = Physics2D.Raycast(rightRay, Vector2.down, rayLength, groundLayer);
