@@ -17,6 +17,8 @@ namespace Managers
         public InputTracker InputTracker { get; private set; }
         
         public PauseInputHandler PauseInputHandler { get; private set; }
+        
+        public PlayerManager PlayerManager { get; private set; }
 
         private void Awake()
         {
@@ -35,6 +37,7 @@ namespace Managers
             GameUIManager = GetComponentInChildren<GameUIManager>();
             InputTracker = GetComponentInChildren<InputTracker>();
             PauseInputHandler = GetComponentInChildren<PauseInputHandler>();
+            PlayerManager = GetComponentInChildren<PlayerManager>();
             
             if (GameSceneManager == null)
                 Debug.LogError("Managers: GameSceneManager not found as child.");
@@ -53,6 +56,9 @@ namespace Managers
             
             if (PauseInputHandler == null)
                 Debug.LogError("Managers: PauseInputHandler not found as child.");
+            
+            if (PlayerManager == null)
+                Debug.LogError("Managers: PlayerManager not found as child.");
         }
     }
 }

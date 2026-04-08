@@ -43,14 +43,11 @@ namespace Player
         
         // Animator
         private Animator _anim;
-        
-        public CollectableHandler CollectableHandler { get; private set; }
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
             _anim = GetComponent<Animator>();
-            CollectableHandler = gameObject.GetComponent<CollectableHandler>();
         }
     
         public void OnMove(InputValue value)

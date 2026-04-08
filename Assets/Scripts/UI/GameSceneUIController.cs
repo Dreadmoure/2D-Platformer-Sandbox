@@ -1,51 +1,87 @@
+using Managers;
 using Player;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace UI
 {
     public class GameSceneUIController : MonoBehaviour
     {
-        private VisualElement _root;
         private Label _collectableValueLabel;
+        private Label _livesValueLabel;
         
-        private CollectableHandler _collectableHandler;
+        private PlayerManager _playerManager;
     
+        private void Awake()
+        {
+            // Subscribe to player events
+            _playerManager = ManagerRoot.Instance.PlayerManager;
+            _playerManager.OnCollectableCountChanged += UpdateCollectibleCountUI;
+            _playerManager.OnLivesCountChanged += UpdateLivesCountUI;
+
+            // Listen for scene changes
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            // Get the root of the UI document
-            _root = GetComponent<UIDocument>().rootVisualElement;
-
-            _collectableValueLabel = _root.Q<Label>("CollectableValueLabel");
-            
-            // Find the player's CollectableHandler
-            _collectableHandler = FindAnyObjectByType<CollectableHandler>();
-
-            if (_collectableHandler != null)
+            // Bind labels for the first loaded scene
+            BindLabels();
+        }
+        
+        private void BindLabels()
+        {
+            var uiDocument = FindAnyObjectByType<UIDocument>();
+            if (uiDocument == null)
             {
-                _collectableHandler.OnCollectableCountChanged += UpdateCollectableUI;
+                Debug.LogWarning("GameSceneUIController: No UIDocument found in the current scene.");
+                _collectableValueLabel = null;
+                _livesValueLabel = null;
+                return;
+            }
 
-                // Optional: initialize UI immediately
-                UpdateCollectableUI(_collectableHandler.GetCount());
-            }
-            else
+            // Schedule the binding for the next frame, ensures rootVisualElement is ready
+            uiDocument.rootVisualElement.schedule.Execute(_ =>
             {
-                Debug.LogWarning("No CollectableHandler found in scene.");
-            }
+                _collectableValueLabel = uiDocument.rootVisualElement.Q<Label>("CollectableValueLabel");
+                _livesValueLabel = uiDocument.rootVisualElement.Q<Label>("LivesValueLabel");
+
+                if (_collectableValueLabel == null)
+                    Debug.LogWarning("GameSceneUIController: Could not find CollectableValueLabel in UIDocument.");
+
+                if (_livesValueLabel == null)
+                    Debug.LogWarning("GameSceneUIController: Could not find LivesValueLabel in UIDocument.");
+
+                // Update UI immediately after binding
+                UpdateCollectibleCountUI(_playerManager.CollectableCount);
+                UpdateLivesCountUI(_playerManager.LivesCount);
+            });
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Rebind labels whenever a new scene loads
+            BindLabels();
         }
         
         private void OnDestroy()
         {
-            if (_collectableHandler != null)
-            {
-                _collectableHandler.OnCollectableCountChanged -= UpdateCollectableUI;
-            }
+            _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
+            _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
         }
 
-        private void UpdateCollectableUI(int count)
+        private void UpdateCollectibleCountUI(int value)
         {
-            _collectableValueLabel.text = _collectableHandler.GetCount().ToString();
+            if (_collectableValueLabel != null)
+                _collectableValueLabel.text = value.ToString();
+        }
+        
+        private void UpdateLivesCountUI(int value)
+        {
+            if (_livesValueLabel != null)
+                _livesValueLabel.text = value.ToString();
         }
     }
 }

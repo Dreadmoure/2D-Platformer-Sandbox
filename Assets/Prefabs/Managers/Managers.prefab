@@ -242,6 +242,52 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1873541607114327245
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3370576561010052207}
+  - component: {fileID: 3790114254031706663}
+  m_Layer: 0
+  m_Name: PlayerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3370576561010052207
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873541607114327245}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6761668457040644538}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3790114254031706663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873541607114327245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24438986b4b1e7f4bad551be1d676956, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
+  livesCount: 3
+  collectableCount: 0
 --- !u!1 &2175267943169395660
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,6 +369,7 @@ Transform:
   - {fileID: 4086671107645019387}
   - {fileID: 2483427872407837213}
   - {fileID: 2331082945501382329}
+  - {fileID: 3370576561010052207}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8064642148787059127
@@ -735,8 +782,29 @@ MonoBehaviour:
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1
-  musicClipsList: []
-  sfxClipsList: []
+  musicClipsList:
+  - type: 0
+    clip: {fileID: 8300000, guid: 8cf6ec209d7e62b42bef033ce9745be3, type: 3}
+    volume: 0.2
+  - type: 1
+    clip: {fileID: 8300000, guid: e64c44050fed1b245be2fc83673170e0, type: 3}
+    volume: 0.03
+  - type: 2
+    clip: {fileID: 8300000, guid: ea7d63df5853c6141b2eaaf1d79d3cc8, type: 3}
+    volume: 1
+  sfxClipsList:
+  - type: 0
+    clip: {fileID: 8300000, guid: f13410c82550f39488e14edd7f12afc1, type: 3}
+    volume: 1
+  - type: 1
+    clip: {fileID: 8300000, guid: 1f6206ad9f9e9a443bcf0bcfb3bafd0e, type: 3}
+    volume: 1
+  - type: 2
+    clip: {fileID: 8300000, guid: 549c3b3d67ddd1643a10265015f1cde0, type: 3}
+    volume: 1
+  - type: 3
+    clip: {fileID: 8300000, guid: 0fac62e935f2bcc46aa9f6be0be9cb46, type: 3}
+    volume: 1.45
 --- !u!1 &8427680773414427242
 GameObject:
   m_ObjectHideFlags: 0

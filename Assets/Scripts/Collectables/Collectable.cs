@@ -17,7 +17,7 @@ namespace Collectables
 
                 if (player != null)
                 {
-                    player.CollectableHandler.AddCount(collectableValue);
+                    ManagerRoot.Instance.PlayerManager.ChangeCollectableCount(collectableValue);
                     ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.CollectablePickup);
                     Destroy(gameObject);
                 }
