@@ -8,8 +8,12 @@ namespace UI
 {
     public class GameSceneUIController : MonoBehaviour
     {
+        [SerializeField]  private UIDocument uiDocument;
+        
         private Label _collectableValueLabel;
         private Label _livesValueLabel;
+
+        private VisualElement _playerHealthFill;
         
         private PlayerManager _playerManager;
     
@@ -17,6 +21,7 @@ namespace UI
         {
             // Subscribe to player events
             _playerManager = ManagerRoot.Instance.PlayerManager;
+            _playerManager.OnHealthChanged += UpdateHealthBar;
             _playerManager.OnCollectableCountChanged += UpdateCollectibleCountUI;
             _playerManager.OnLivesCountChanged += UpdateLivesCountUI;
 
@@ -33,43 +38,82 @@ namespace UI
         
         private void BindLabels()
         {
-            var uiDocument = FindAnyObjectByType<UIDocument>();
+            // Always clear old references first
+            _collectableValueLabel = null;
+            _livesValueLabel = null;
+
             if (uiDocument == null)
             {
-                Debug.LogWarning("GameSceneUIController: No UIDocument found in the current scene.");
-                _collectableValueLabel = null;
-                _livesValueLabel = null;
+                Debug.LogWarning("GameSceneUIController: No UIDocument assigned.");
                 return;
             }
 
-            // Schedule the binding for the next frame, ensures rootVisualElement is ready
+            // Wait until the UIDocument has built its visual tree
             uiDocument.rootVisualElement.schedule.Execute(_ =>
             {
                 _collectableValueLabel = uiDocument.rootVisualElement.Q<Label>("CollectableValueLabel");
                 _livesValueLabel = uiDocument.rootVisualElement.Q<Label>("LivesValueLabel");
+                
+                _playerHealthFill = uiDocument.rootVisualElement.Q<VisualElement>("HealthBarFill");
 
-                if (_collectableValueLabel == null)
-                    Debug.LogWarning("GameSceneUIController: Could not find CollectableValueLabel in UIDocument.");
+                // If gameplay labels or health bar are missing, skip updating
+                if (_collectableValueLabel == null && _livesValueLabel == null && _playerHealthFill == null)
+                    return;
 
-                if (_livesValueLabel == null)
-                    Debug.LogWarning("GameSceneUIController: Could not find LivesValueLabel in UIDocument.");
-
-                // Update UI immediately after binding
+                // Update HUD immediately when labels are found
                 UpdateCollectibleCountUI(_playerManager.CollectableCount);
                 UpdateLivesCountUI(_playerManager.LivesCount);
+                UpdateHealthBar(_playerManager.CurrentHealth, _playerManager.MaxHealth);
             });
         }
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // Rebind labels whenever a new scene loads
-            BindLabels();
+            // Get the list of gameplay scene names
+            var gameplayScenes = ManagerRoot.Instance.GameSceneManager.GetGameSceneNames();
+
+            // Only bind labels if this scene is in the gameplay list
+            if (gameplayScenes.Contains(scene.name))
+            {
+                BindLabels();
+            }
+            else
+            {
+                // Optional: clear labels so UI doesn't show stale data
+                _playerHealthFill = null;
+                _collectableValueLabel = null;
+                _livesValueLabel = null;
+            }
         }
         
         private void OnDestroy()
         {
-            _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
-            _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            
+            if (_playerManager != null)
+            {
+                _playerManager.OnHealthChanged -= UpdateHealthBar;
+                _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
+                _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
+            }
+        }
+        
+        private void UpdateHealthBar(float currentHealth, float maxHealth)
+        {
+            if (_playerHealthFill == null || maxHealth <= 0) return;
+
+            // Compute percent of health
+            float percent = Mathf.Clamp01(currentHealth / maxHealth);
+
+            // Schedule the width update on the next frame
+            _playerHealthFill.schedule.Execute(_ =>
+            {
+                if (_playerHealthFill.parent != null)
+                {
+                    float parentWidth = _playerHealthFill.parent.resolvedStyle.width;
+                    _playerHealthFill.style.width = Length.Pixels(parentWidth * percent);
+                }
+            });
         }
 
         private void UpdateCollectibleCountUI(int value)

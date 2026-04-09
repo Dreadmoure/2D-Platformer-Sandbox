@@ -9,6 +9,7 @@ namespace Managers
     {
         [SerializeField] private GameObject mainMenuUI;
         [SerializeField] private GameObject gameSceneUI;
+        [SerializeField] private GameObject winMenuUI;
         [SerializeField] private GameObject gameOverMenuUI;
         
         private Dictionary<string, GameObject> _sceneToUIMap;
@@ -19,6 +20,7 @@ namespace Managers
             _sceneToUIMap = new Dictionary<string, GameObject>
             {
                 { ManagerRoot.Instance.GameSceneManager.GetMainMenuSceneName(), mainMenuUI },
+                { ManagerRoot.Instance.GameSceneManager.GetWinMenuSceneName(), winMenuUI },
                 { ManagerRoot.Instance.GameSceneManager.GetGameOverMenuSceneName(), gameOverMenuUI }
             };
             

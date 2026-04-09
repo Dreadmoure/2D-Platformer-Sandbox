@@ -1,27 +1,38 @@
+using Managers;
 using UnityEngine;
 
-public class PlayerSpawnPoint : MonoBehaviour
+namespace Player
 {
-    [SerializeField]  private GameObject playerPrefab;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class PlayerSpawnPoint : MonoBehaviour
     {
-        if (GameObject.FindGameObjectWithTag("Player") != null)
-            return;
-
-        if (playerPrefab == null)
+        [SerializeField]  private GameObject playerPrefab;
+    
+        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Start()
         {
-            Debug.LogError("PlayerSpawnPoint: No Player prefab assigned!", this);
-            return;
+            if (GameObject.FindGameObjectWithTag("Player") != null)
+                return;
+
+            if (playerPrefab == null)
+            {
+                Debug.LogError("PlayerSpawnPoint: No Player prefab assigned!", this);
+                return;
+            }
+
+            Instantiate(playerPrefab, transform.position, transform.rotation);
         }
 
-        Instantiate(playerPrefab, transform.position, transform.rotation);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void RespawnPlayer()
+        {
+            if (ManagerRoot.Instance.PlayerManager.LivesCount > 0)
+            {
+                Instantiate(playerPrefab, transform.position, transform.rotation);
+                ManagerRoot.Instance.PlayerManager.ResetHealth();
+            }
+            else
+            {
+                ManagerRoot.Instance.GameSceneManager.LoadGameOverMenuScene();
+            }
+        }
     }
 }

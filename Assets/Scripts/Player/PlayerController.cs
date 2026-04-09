@@ -40,6 +40,8 @@ namespace Player
         // Timing
         private float _coyoteTimeCounter;
         private float _jumpBufferCounter;
+
+        private SpriteRenderer _spriteRenderer;
         
         // Animator
         private Animator _anim;
@@ -48,6 +50,7 @@ namespace Player
         {
             _rb = GetComponent<Rigidbody2D>();
             _anim = GetComponent<Animator>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
         }
     
         public void OnMove(InputValue value)
@@ -75,14 +78,14 @@ namespace Player
             _anim.SetFloat("Speed", Mathf.Abs(_moveInput.x));
             _anim.SetBool("IsGrounded", IsGrounded());
             
-            // Rotate player so the sprite turns the correct way
+            // Rotate sprite so the sprite turns the correct way
             if (_moveInput.x > 0.01f)
             {
-                transform.localScale = new Vector3(1, 1, 1);
+                _spriteRenderer.flipX = false;
             }
             else if (_moveInput.x < -0.01f)
             {
-                transform.localScale = new Vector3(-1, 1, 1);
+                _spriteRenderer.flipX = true;
             }
         }
 

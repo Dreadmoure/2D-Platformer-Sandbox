@@ -11,12 +11,15 @@ namespace Managers
         
         [SerializeField] private List<SceneAsset> gameScenes;
         
+        [SerializeField] private SceneAsset winMenuScene;
+        
         [SerializeField] private SceneAsset gameOverMenuScene;
 
         private int _currentSceneIndex;
         
         public string GetMainMenuSceneName() => mainMenuScene?.name;
         public string GetGameOverMenuSceneName() => gameOverMenuScene?.name;
+        public string GetWinMenuSceneName() => winMenuScene?.name;
         public List<string> GetGameSceneNames()
         {
             var names = new List<string>();
@@ -73,7 +76,7 @@ namespace Managers
 
             if (_currentSceneIndex + 1 >= gameScenes.Count)
             {
-                LoadGameOverMenuScene();
+                LoadWinMenuScene();
                 return;
             }
 
@@ -94,6 +97,17 @@ namespace Managers
             }
 
             SceneManager.LoadScene(gameScenes[index].name);
+        }
+        
+        public void LoadWinMenuScene()
+        {
+            if (winMenuScene == null)
+            {
+                Debug.LogError("No SceneAsset assigned in Win Menu Scene field");
+                return;
+            }
+
+            SceneManager.LoadScene(winMenuScene.name);
         }
 
         public void LoadGameOverMenuScene()
@@ -118,6 +132,15 @@ namespace Managers
             else
             {
                 Debug.LogWarning("Main Menu Scene is not assigned.");
+            }
+            
+            if (winMenuScene != null)
+            {
+                result.Add(winMenuScene.name);
+            }
+            else
+            {
+                Debug.LogWarning("Win Menu Scene is not assigned.");
             }
             
             if (gameOverMenuScene != null)
