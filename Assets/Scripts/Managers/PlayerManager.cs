@@ -16,11 +16,14 @@ namespace Managers
         public event Action<float, float> OnHealthChanged; 
         public event Action<int> OnCollectableCountChanged;
         public event Action<int> OnLivesCountChanged;
+        public event Action OnPlayerDied;
     
         public float CurrentHealth { get; private set; }
         public float MaxHealth { get; private set; }
         public int LivesCount { get; private set; }
         public int CollectableCount { get; private set; }
+        
+        private bool _isDead = false;
         
         private void Awake()
         {
@@ -36,10 +39,50 @@ namespace Managers
             OnLivesCountChanged?.Invoke(LivesCount);
         }
 
-        public void UpdateHealth(float value)
+        public void TakeDamage(float value)
         {
-            CurrentHealth += value;
+            Debug.Log("A - TakeDamage ENTER");
+            if (_isDead) return; // 🛑 prevent repeated death
+            
+            CurrentHealth -= value;
+            
+            Debug.Log("B - After damage calc");
+            
+            if (CurrentHealth <= 0)
+            {
+                Debug.Log("B - After damage calc");
+                ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.TakeDamage);
+                CurrentHealth = 0;
+                _isDead = true;
+
+                LivesCount--;
+                
+                Debug.Log("D - Before event");
+                OnPlayerDied?.Invoke(); // Trigger respawn system
+                Debug.Log("E - After event");
+                OnLivesCountChanged?.Invoke(LivesCount);
+            }
+            Debug.Log("E - After event");
             OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        }
+        
+        public bool Heal(float amount)
+        {
+            if (_isDead) return false;
+            
+            if (CurrentHealth >= MaxHealth)
+                return false; // nothing to heal
+
+            float oldHealth = CurrentHealth;
+
+            CurrentHealth += amount;
+
+            if (CurrentHealth > MaxHealth)
+                CurrentHealth = MaxHealth;
+
+            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+
+            return CurrentHealth > oldHealth; // ✅ actually healed
         }
         
         public void ChangeCollectableCount(int value)
@@ -56,12 +99,14 @@ namespace Managers
 
         public void ResetHealth()
         {
+            _isDead = false;
             CurrentHealth = MaxHealth;
             OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
         }
 
-        private void ResetValues()
+        public void ResetValues()
         {
+            _isDead = false;
             MaxHealth = maxHealth;
             CurrentHealth = MaxHealth;
             LivesCount = livesCount;

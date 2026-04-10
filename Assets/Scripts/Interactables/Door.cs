@@ -13,6 +13,8 @@ namespace Interactables
                 return;
             }
             
+            ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.Door);
+            
             // Load next scene
             ManagerRoot.Instance.GameSceneManager.LoadNextScene();
         }

@@ -55,6 +55,7 @@ namespace Managers
             // Deactivate all first
             mainMenuUI.SetActive(false);
             gameSceneUI.SetActive(false);
+            winMenuUI.SetActive(false);
             gameOverMenuUI.SetActive(false);
 
             // Activate the right UI if mapped

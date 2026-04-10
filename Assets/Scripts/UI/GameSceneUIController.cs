@@ -21,6 +21,11 @@ namespace UI
         {
             // Subscribe to player events
             _playerManager = ManagerRoot.Instance.PlayerManager;
+            
+            _playerManager.OnHealthChanged -= UpdateHealthBar;
+            _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
+            _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
+            
             _playerManager.OnHealthChanged += UpdateHealthBar;
             _playerManager.OnCollectableCountChanged += UpdateCollectibleCountUI;
             _playerManager.OnLivesCountChanged += UpdateLivesCountUI;

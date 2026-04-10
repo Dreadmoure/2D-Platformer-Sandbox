@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,6 +32,8 @@ namespace Managers
         
         private void Awake()
         {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         

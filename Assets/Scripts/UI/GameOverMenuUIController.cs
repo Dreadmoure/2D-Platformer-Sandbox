@@ -54,17 +54,24 @@ namespace UI
         
         private void OnRetryClicked()
         {
+            CallReset();
             ManagerRoot.Instance.GameSceneManager.LoadGameScene(0);
         }
         
         private void OnBackToMainMenuClicked()
         {
+            CallReset();
             ManagerRoot.Instance.GameSceneManager.LoadMainMenuScene();
         }
 
         private void OnQuitClicked()
         {
             Application.Quit();
+        }
+
+        private void CallReset()
+        {
+            ManagerRoot.Instance.PlayerManager.ResetValues();
         }
     }
 }

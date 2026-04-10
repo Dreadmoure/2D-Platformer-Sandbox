@@ -1,35 +1,44 @@
 using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+namespace Camera
 {
-    private Transform _target;
-
-    [Tooltip("The offset of the camera")]
-    [SerializeField] private Vector3 offset = new Vector3(0f, 0f, -10f);
-
-    private void Start()
+    public class CameraFollow : MonoBehaviour
     {
-        FindPlayer();
-    }
+        [Tooltip("Toggle this on for the camera to follow the player or off for it to be static")]
+        [SerializeField] private bool toggleFollowPlayer = true;
+    
+        private Transform _target;
 
-    private void LateUpdate()
-    {
-        if (_target == null)
+        [Tooltip("The offset of the camera")]
+        [SerializeField] private Vector3 offset = new Vector3(0f, 0f, -10f);
+
+        private void Start()
         {
             FindPlayer();
-            return;
         }
 
-        transform.position = _target.position + offset;
-    }
-
-    private void FindPlayer()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null)
+        private void LateUpdate()
         {
-            _target = player.transform;
+            if (toggleFollowPlayer)
+            {
+                if (_target == null)
+                {
+                    FindPlayer();
+                    return;
+                }
+
+                transform.position = _target.position + offset;
+            }
+        }
+
+        private void FindPlayer()
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player != null)
+            {
+                _target = player.transform;
+            }
         }
     }
 }

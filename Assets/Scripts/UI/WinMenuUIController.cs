@@ -30,6 +30,8 @@ namespace UI
 
                 // Subscribe to player events
                 var playerManager = ManagerRoot.Instance.PlayerManager;
+                playerManager.OnCollectableCountChanged -= UpdateCollectableCountLabel;
+                
                 playerManager.OnCollectableCountChanged += UpdateCollectableCountLabel;
 
                 // Immediately update label with current value
@@ -73,17 +75,24 @@ namespace UI
         
         private void OnRetryClicked()
         {
+            CallReset();
             ManagerRoot.Instance.GameSceneManager.LoadGameScene(0);
         }
         
         private void OnBackToMainMenuClicked()
         {
+            CallReset();
             ManagerRoot.Instance.GameSceneManager.LoadMainMenuScene();
         }
 
         private void OnQuitClicked()
         {
             Application.Quit();
+        }
+        
+        private void CallReset()
+        {
+            ManagerRoot.Instance.PlayerManager.ResetValues();
         }
     }
 }

@@ -1,45 +1,37 @@
 using Managers;
-using Player;
 using UnityEngine;
 
-public class Trap : MonoBehaviour
+namespace Dangers
 {
-    [Tooltip("The amount of damage done to the player")]
-    [SerializeField] private float damage = 50f;
-    [SerializeField] private bool isActive = true;
-
-    private void OnTriggerEnter2D(Collider2D other)
+    public class Trap : MonoBehaviour
     {
-        if (isActive)
-        {
-            if (other.CompareTag("Player"))
-            {
-                isActive = false;
-                ManagerRoot.Instance.PlayerManager.UpdateHealth(-damage);
+        [Tooltip("The amount of damage done to the player")]
+        [SerializeField] private float damage = 50f;
+        [SerializeField] private bool isActive = true;
+        
+        Animator animator;
 
-                if (ManagerRoot.Instance.PlayerManager.CurrentHealth <= 0)
+        private void Start()
+        {
+            animator = GetComponent<Animator>();
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (isActive)
+            {
+                if (other.CompareTag("Player"))
                 {
-                    // Destroy player
-                    Destroy(other.gameObject);
+                    isActive = false;
                     
-                    // Decrease player lives
-                    ManagerRoot.Instance.PlayerManager.ChangeLivesCount(-1);
+                    ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.Trap);
                     
-                    // Call on spawner to spawn player -> let it check if player has lives left otherwise change scene to gameover scene
-                    GameObject playerSpawnPoint = GameObject.FindGameObjectWithTag("PlayerSpawnPoint");
-            
-                    if (playerSpawnPoint == null)
-                    {
-                        Debug.LogError("No player spawn point object found in scene");
-                        return;
-                    }
-            
-                    PlayerSpawnPoint component = playerSpawnPoint.GetComponent<PlayerSpawnPoint>();
-            
-                    component.RespawnPlayer();
+                    animator.SetTrigger("TrapTriggered");
+                    
+                    ManagerRoot.Instance.PlayerManager.TakeDamage(damage);
                 }
             }
-        }
         
+        }
     }
 }

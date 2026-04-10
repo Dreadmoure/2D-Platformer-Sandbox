@@ -20,6 +20,7 @@ namespace Managers
         {
             MainMenu,
             Game,
+            Win,
             GameOver
             // Add more as needed
         }
@@ -29,7 +30,11 @@ namespace Managers
             MenuNavigate,
             MenuSelect,
             Jump,
-            CollectablePickup
+            CollectablePickup,
+            Trap,
+            Door,
+            TakeDamage,
+            Heal
             // Add more as needed
         }
         
@@ -114,6 +119,8 @@ namespace Managers
                 PlayMusic(MusicType.MainMenu);
             else if (activeScene == ManagerRoot.Instance.GameSceneManager.GetGameOverMenuSceneName())
                 PlayMusic(MusicType.GameOver);
+            else if (activeScene == ManagerRoot.Instance.GameSceneManager.GetWinMenuSceneName())
+                PlayMusic(MusicType.Win);
             else
                 PlayMusic(MusicType.Game); // default for in-game scenes
         }

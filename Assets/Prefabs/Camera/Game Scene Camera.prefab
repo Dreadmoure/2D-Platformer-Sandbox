@@ -150,4 +150,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d66e4920c9b14724e89f8de24f5369b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
+  toggleFollowPlayer: 1
   offset: {x: 0, y: 0, z: -10}

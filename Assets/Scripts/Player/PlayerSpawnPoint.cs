@@ -6,6 +6,13 @@ namespace Player
     public class PlayerSpawnPoint : MonoBehaviour
     {
         [SerializeField]  private GameObject playerPrefab;
+
+        private void OnEnable()
+        {
+            ManagerRoot.Instance.PlayerManager.OnPlayerDied -= RespawnPlayer;
+            
+            ManagerRoot.Instance.PlayerManager.OnPlayerDied += RespawnPlayer;
+        }
     
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -21,13 +28,21 @@ namespace Player
 
             Instantiate(playerPrefab, transform.position, transform.rotation);
         }
-
-        public void RespawnPlayer()
+        
+        private void OnDisable()
         {
-            if (ManagerRoot.Instance.PlayerManager.LivesCount > 0)
+            if (ManagerRoot.Instance != null)
+                ManagerRoot.Instance.PlayerManager.OnPlayerDied -= RespawnPlayer;
+        }
+
+        private void RespawnPlayer()
+        {
+            var playerManager = ManagerRoot.Instance.PlayerManager;
+
+            if (playerManager.LivesCount > 0)
             {
                 Instantiate(playerPrefab, transform.position, transform.rotation);
-                ManagerRoot.Instance.PlayerManager.ResetHealth();
+                playerManager.ResetHealth();
             }
             else
             {
