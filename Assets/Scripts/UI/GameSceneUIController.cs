@@ -21,14 +21,6 @@ namespace UI
         {
             // Subscribe to player events
             _playerManager = ManagerRoot.Instance.PlayerManager;
-            
-            _playerManager.OnHealthChanged -= UpdateHealthBar;
-            _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
-            _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
-            
-            _playerManager.OnHealthChanged += UpdateHealthBar;
-            _playerManager.OnCollectableCountChanged += UpdateCollectibleCountUI;
-            _playerManager.OnLivesCountChanged += UpdateLivesCountUI;
 
             // Listen for scene changes
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -94,16 +86,9 @@ namespace UI
         private void OnDestroy()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
-            
-            if (_playerManager != null)
-            {
-                _playerManager.OnHealthChanged -= UpdateHealthBar;
-                _playerManager.OnCollectableCountChanged -= UpdateCollectibleCountUI;
-                _playerManager.OnLivesCountChanged -= UpdateLivesCountUI;
-            }
         }
         
-        private void UpdateHealthBar(float currentHealth, float maxHealth)
+        public void UpdateHealthBar(float currentHealth, float maxHealth)
         {
             if (_playerHealthFill == null || maxHealth <= 0) return;
 
@@ -121,13 +106,13 @@ namespace UI
             });
         }
 
-        private void UpdateCollectibleCountUI(int value)
+        public void UpdateCollectibleCountUI(int value)
         {
             if (_collectableValueLabel != null)
                 _collectableValueLabel.text = value.ToString();
         }
         
-        private void UpdateLivesCountUI(int value)
+        public void UpdateLivesCountUI(int value)
         {
             if (_livesValueLabel != null)
                 _livesValueLabel.text = value.ToString();

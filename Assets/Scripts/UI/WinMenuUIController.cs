@@ -30,9 +30,6 @@ namespace UI
 
                 // Subscribe to player events
                 var playerManager = ManagerRoot.Instance.PlayerManager;
-                playerManager.OnCollectableCountChanged -= UpdateCollectableCountLabel;
-                
-                playerManager.OnCollectableCountChanged += UpdateCollectableCountLabel;
 
                 // Immediately update label with current value
                 UpdateCollectableCountLabel(playerManager.CollectableCount);
@@ -49,12 +46,6 @@ namespace UI
         /// </summary>
         private void OnDisable()
         {
-            var playerManager = ManagerRoot.Instance.PlayerManager;
-            if (playerManager != null)
-            {
-                playerManager.OnCollectableCountChanged -= UpdateCollectableCountLabel;
-            }
-            
             if (_retryButton != null)
                 _retryButton.clicked -= OnRetryClicked;
 
@@ -67,7 +58,7 @@ namespace UI
             if (_collectableCountLabel != null) _collectableCountLabel.text = "";
         }
         
-        private void UpdateCollectableCountLabel(int value)
+        public void UpdateCollectableCountLabel(int value)
         {
             if (_collectableCountLabel != null)
                 _collectableCountLabel.text = value.ToString();

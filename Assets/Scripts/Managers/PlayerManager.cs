@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Managers
@@ -12,11 +12,6 @@ namespace Managers
     
         [Tooltip("How many collectibles the player starts with")]
         [SerializeField] private int collectableCount = 0;
-        
-        public event Action<float, float> OnHealthChanged; 
-        public event Action<int> OnCollectableCountChanged;
-        public event Action<int> OnLivesCountChanged;
-        public event Action OnPlayerDied;
     
         public float CurrentHealth { get; private set; }
         public float MaxHealth { get; private set; }
@@ -24,6 +19,7 @@ namespace Managers
         public int CollectableCount { get; private set; }
         
         private bool _isDead = false;
+        private bool _deathTriggered = false;
         
         private void Awake()
         {
@@ -33,37 +29,52 @@ namespace Managers
 
         private void Start()
         {
-            // Optional: notify anything that subscribed in Start()
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
-            OnCollectableCountChanged?.Invoke(CollectableCount);
-            OnLivesCountChanged?.Invoke(LivesCount);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateHealthBar(CurrentHealth, MaxHealth);
+            ManagerRoot.Instance.GameUIManager.WinMenuUIController.UpdateCollectableCountLabel(CollectableCount);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateLivesCountUI(LivesCount);
         }
 
         public void TakeDamage(float value)
         {
-            Debug.Log("A - TakeDamage ENTER");
-            if (_isDead) return; // 🛑 prevent repeated death
+            Debug.Log("TakeDamage FRAME: " + Time.frameCount);
+            
+            // HARD LOCK (prevents ANY re-entry)
+            if (_isDead || _deathTriggered)
+                return;
             
             CurrentHealth -= value;
             
             Debug.Log("B - After damage calc");
             
-            if (CurrentHealth <= 0)
+            if (CurrentHealth > 0)
             {
-                Debug.Log("B - After damage calc");
-                ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.TakeDamage);
-                CurrentHealth = 0;
-                _isDead = true;
-
-                LivesCount--;
-                
-                Debug.Log("D - Before event");
-                OnPlayerDied?.Invoke(); // Trigger respawn system
-                Debug.Log("E - After event");
-                OnLivesCountChanged?.Invoke(LivesCount);
+                ManagerRoot.Instance.GameUIManager.GameSceneUIController
+                    .UpdateHealthBar(CurrentHealth, MaxHealth);
+                return;
             }
-            Debug.Log("E - After event");
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+
+            // ENTER DEATH STATE IMMEDIATELY
+            _isDead = true;
+            _deathTriggered = true;
+
+            CurrentHealth = 0;
+            LivesCount--;
+
+            Debug.Log("D - Death triggered");
+
+            ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.TakeDamage);
+
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController
+                .UpdateLivesCountUI(LivesCount);
+
+            StartCoroutine(HandleDeathNextFrame());
+        }
+        
+        private IEnumerator HandleDeathNextFrame()
+        {
+            yield return null;
+
+            ManagerRoot.Instance.DeathFlowManager.HandlePlayerDeath();
         }
         
         public bool Heal(float amount)
@@ -80,7 +91,7 @@ namespace Managers
             if (CurrentHealth > MaxHealth)
                 CurrentHealth = MaxHealth;
 
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateHealthBar(CurrentHealth, MaxHealth);
 
             return CurrentHealth > oldHealth; // ✅ actually healed
         }
@@ -88,25 +99,29 @@ namespace Managers
         public void ChangeCollectableCount(int value)
         {
             CollectableCount += value;
-            OnCollectableCountChanged?.Invoke(CollectableCount);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateCollectibleCountUI(CollectableCount);
+            ManagerRoot.Instance.GameUIManager.WinMenuUIController.UpdateCollectableCountLabel(CollectableCount);
         }
 
         public void ChangeLivesCount(int value)
         {
             LivesCount += value;
-            OnLivesCountChanged?.Invoke(LivesCount);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateLivesCountUI(LivesCount);
         }
 
         public void ResetHealth()
         {
             _isDead = false;
+            _deathTriggered = false;
+            
             CurrentHealth = MaxHealth;
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            ManagerRoot.Instance.GameUIManager.GameSceneUIController.UpdateHealthBar(CurrentHealth, MaxHealth);
         }
 
         public void ResetValues()
         {
             _isDead = false;
+            _deathTriggered = false;
             MaxHealth = maxHealth;
             CurrentHealth = MaxHealth;
             LivesCount = livesCount;

@@ -738,7 +738,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeathFlowManager
   playerPrefab: {fileID: 6970982534820586111, guid: 58b7e2e9e6160034381e8654afe499b6, type: 3}
-  spawnPoint: {fileID: 0}
 --- !u!1 &5754634402781957457
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,6 +937,9 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 6e046fb22c4bbd942ab148f3fd072bb8, type: 3}
     volume: 1.45
   - type: 7
+    clip: {fileID: 8300000, guid: 467b8715dbad7ba4abf7dc01e7ab3766, type: 3}
+    volume: 1.45
+  - type: 8
     clip: {fileID: 8300000, guid: 467b8715dbad7ba4abf7dc01e7ab3766, type: 3}
     volume: 1.45
 --- !u!1 &8427680773414427242

@@ -1,3 +1,4 @@
+ using System.Collections;
  using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,9 @@ namespace Managers
         [SerializeField] private SceneAsset gameOverMenuScene;
 
         private int _currentSceneIndex;
+        private bool _isLoadingScene = false;
         
+        #region Scene Name Getters
         public string GetMainMenuSceneName() => mainMenuScene?.name;
         public string GetGameOverMenuSceneName() => gameOverMenuScene?.name;
         public string GetWinMenuSceneName() => winMenuScene?.name;
@@ -29,6 +32,7 @@ namespace Managers
             }
             return names;
         }
+        #endregion
         
         private void Awake()
         {
@@ -45,22 +49,37 @@ namespace Managers
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             _currentSceneIndex = gameScenes.FindIndex(s => s.name == scene.name);
+            
+            // Reset loading lock after scene is loaded
+            _isLoadingScene = false;
         }
 
         public void LoadMainMenuScene()
         {
-            if (mainMenuScene == null)
+            TryLoadScene(mainMenuScene);
+        }
+        
+        public void LoadWinMenuScene()
+        {
+            TryLoadScene(winMenuScene);
+        }
+        
+        public void LoadGameOverMenuScene()
+        {
+            TryLoadScene(gameOverMenuScene);
+        }
+        
+        public void LoadGameScene(int index)
+        {
+            if (index < 0 || index >= gameScenes.Count)
             {
-                Debug.LogError("No SceneAsset assigned in Main Menu Scene field");
+                Debug.LogError($"Invalid scene index: {index}");
                 return;
             }
-            
-            SceneManager.LoadScene(mainMenuScene.name);
+
+            TryLoadScene(gameScenes[index]);
         }
 
-        /// <summary>
-        /// Loads the next scene on the gameScenes list if there are none, go to gameover menu scene
-        /// </summary>
         public void LoadNextScene()
         {
             if (gameScenes == null || gameScenes.Count == 0)
@@ -71,8 +90,7 @@ namespace Managers
 
             if (_currentSceneIndex < 0)
             {
-                _currentSceneIndex = 0;
-                SceneManager.LoadScene(gameScenes[0].name);
+                TryLoadScene(gameScenes[0]);
                 return;
             }
 
@@ -83,78 +101,56 @@ namespace Managers
             }
 
             _currentSceneIndex++;
-            SceneManager.LoadScene(gameScenes[_currentSceneIndex].name);
-        }
-
-        /// <summary>
-        /// Load a specific scene based on the index of scenes list
-        /// </summary>
-        /// <param name="index">index on scenes list starting from 0</param>
-        public void LoadGameScene(int index)
-        {
-            if (index < 0 || index >= gameScenes.Count)
-            {
-                Debug.LogError($"Invalid scene index: {index}");
-                return;
-            }
-
-            SceneManager.LoadScene(gameScenes[index].name);
+            TryLoadScene(gameScenes[_currentSceneIndex]);
         }
         
-        public void LoadWinMenuScene()
+        private void TryLoadScene(SceneAsset sceneAsset)
         {
-            if (winMenuScene == null)
+            if (_isLoadingScene)
             {
-                Debug.LogError("No SceneAsset assigned in Win Menu Scene field");
                 return;
             }
 
-            SceneManager.LoadScene(winMenuScene.name);
-        }
-
-        public void LoadGameOverMenuScene()
-        {
-            if (gameOverMenuScene == null)
+            if (sceneAsset == null)
             {
-                Debug.LogError("No SceneAsset assigned in Game Over Menu Scene field");
                 return;
             }
 
-            SceneManager.LoadScene(gameOverMenuScene.name);
-        }
+            _isLoadingScene = true;
 
+            StartCoroutine(LoadSceneSafely(sceneAsset.name));
+        }
+        
+        private IEnumerator LoadSceneSafely(string sceneName)
+        {
+            // Wait for physics to fully finish
+            yield return new WaitForFixedUpdate();
+
+            // Wait until end of frame (render + destruction done)
+            yield return new WaitForEndOfFrame();
+
+            // Extra safety frame
+            yield return null;
+
+            SceneManager.LoadScene(sceneName);
+        }
+        
+        #region Utility
         public List<string> GetNonPausableScenesByName()
         {
             var result = new List<string>();
 
             if (mainMenuScene != null)
-            {
                 result.Add(mainMenuScene.name);
-            }
-            else
-            {
-                Debug.LogWarning("Main Menu Scene is not assigned.");
-            }
-            
+
             if (winMenuScene != null)
-            {
                 result.Add(winMenuScene.name);
-            }
-            else
-            {
-                Debug.LogWarning("Win Menu Scene is not assigned.");
-            }
-            
+
             if (gameOverMenuScene != null)
-            {
                 result.Add(gameOverMenuScene.name);
-            }
-            else
-            {
-                Debug.LogWarning("Game Over Menu Scene is not assigned.");
-            }
-            
+
             return result;
         }
+        #endregion
     }
 }

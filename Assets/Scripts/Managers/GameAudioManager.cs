@@ -34,7 +34,8 @@ namespace Managers
             Trap,
             Door,
             TakeDamage,
-            Heal
+            Heal,
+            LifePickup
             // Add more as needed
         }
         

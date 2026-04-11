@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -19,6 +20,8 @@ namespace Managers
         public PauseInputHandler PauseInputHandler { get; private set; }
         
         public PlayerManager PlayerManager { get; private set; }
+        
+        public DeathFlowManager DeathFlowManager { get; private set; }
 
         private void Awake()
         {
@@ -38,6 +41,7 @@ namespace Managers
             InputTracker = GetComponentInChildren<InputTracker>();
             PauseInputHandler = GetComponentInChildren<PauseInputHandler>();
             PlayerManager = GetComponentInChildren<PlayerManager>();
+            DeathFlowManager = GetComponentInChildren<DeathFlowManager>();
             
             if (GameSceneManager == null)
                 Debug.LogError("Managers: GameSceneManager not found as child.");
@@ -59,6 +63,9 @@ namespace Managers
             
             if (PlayerManager == null)
                 Debug.LogError("Managers: PlayerManager not found as child.");
+            
+            if (DeathFlowManager == null)
+                Debug.LogError("Managers: DeathFlowManager not found as child.");
         }
     }
 }

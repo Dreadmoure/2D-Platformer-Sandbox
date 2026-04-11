@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,9 +14,25 @@ namespace Managers
         [SerializeField] private GameObject gameOverMenuUI;
         
         private Dictionary<string, GameObject> _sceneToUIMap;
+        
+        public MainMenuUIController MainMenuUIController { get; private set; }
+        public GameSceneUIController GameSceneUIController { get; private set; }
+        public WinMenuUIController WinMenuUIController { get; private set; }
+        public GameOverMenuUIController GameOverSceneUIController { get; private set; }
 
         private void Awake()
         {
+            MainMenuUIController = mainMenuUI.GetComponent<MainMenuUIController>();
+            GameSceneUIController = gameSceneUI.GetComponent<GameSceneUIController>();
+            WinMenuUIController = winMenuUI.GetComponent<WinMenuUIController>();
+            GameOverSceneUIController = gameOverMenuUI.GetComponent<GameOverMenuUIController>();
+
+            if (GameSceneUIController == null)
+            {
+                Debug.Log("GameUIManager: GameSceneUIController is null");
+            }
+            
+            
             // Map scene names to UI GameObjects
             _sceneToUIMap = new Dictionary<string, GameObject>
             {

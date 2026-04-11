@@ -2021,7 +2021,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &619394801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2042,7 +2042,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 00000000059a169a192c6990ffaf700b
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -4782,11 +4782,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6299688340292314490, guid: a496f5788bda6234c823b10a8efcde80, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.12375
+      value: -6.1368747
       objectReference: {fileID: 0}
     - target: {fileID: 6299688340292314490, guid: a496f5788bda6234c823b10a8efcde80, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.381875
+      value: -0.750625
       objectReference: {fileID: 0}
     - target: {fileID: 6299688340292314490, guid: a496f5788bda6234c823b10a8efcde80, type: 3}
       propertyPath: m_LocalPosition.z
