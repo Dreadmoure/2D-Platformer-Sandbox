@@ -8,36 +8,27 @@ namespace Managers
 {
     public class GameSceneManager : MonoBehaviour
     {
-        [SerializeField] private SceneAsset mainMenuScene;
-        
-        [SerializeField] private List<SceneAsset> gameScenes;
-        
-        [SerializeField] private SceneAsset winMenuScene;
-        
-        [SerializeField] private SceneAsset gameOverMenuScene;
+        [Header("Scene Names (must match Build Settings)")]
+        [SerializeField] private string mainMenuScene;
+        [SerializeField] private List<string> gameScenes;
+        [SerializeField] private string winMenuScene;
+        [SerializeField] private string gameOverMenuScene;
 
         private int _currentSceneIndex;
         private bool _isLoadingScene = false;
         
         #region Scene Name Getters
-        public string GetMainMenuSceneName() => mainMenuScene?.name;
-        public string GetGameOverMenuSceneName() => gameOverMenuScene?.name;
-        public string GetWinMenuSceneName() => winMenuScene?.name;
+        public string GetMainMenuSceneName() => mainMenuScene;
+        public string GetGameOverMenuSceneName() => gameOverMenuScene;
+        public string GetWinMenuSceneName() => winMenuScene;
         public List<string> GetGameSceneNames()
         {
-            var names = new List<string>();
-            foreach (var s in gameScenes)
-            {
-                if (s != null) names.Add(s.name);
-            }
-            return names;
+            return new List<string>(gameScenes);
         }
         #endregion
         
         private void Awake()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         
@@ -48,7 +39,7 @@ namespace Managers
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            _currentSceneIndex = gameScenes.FindIndex(s => s.name == scene.name);
+            _currentSceneIndex = gameScenes.IndexOf(scene.name);
             
             // Reset loading lock after scene is loaded
             _isLoadingScene = false;
@@ -57,6 +48,8 @@ namespace Managers
         public void LoadMainMenuScene()
         {
             TryLoadScene(mainMenuScene);
+            // reset player values
+            ManagerRoot.Instance.PlayerManager.ResetValues();
         }
         
         public void LoadWinMenuScene()
@@ -104,33 +97,23 @@ namespace Managers
             TryLoadScene(gameScenes[_currentSceneIndex]);
         }
         
-        private void TryLoadScene(SceneAsset sceneAsset)
+        private void TryLoadScene(string sceneName)
         {
-            if (_isLoadingScene)
-            {
+            if (_isLoadingScene || string.IsNullOrEmpty(sceneName))
                 return;
-            }
-
-            if (sceneAsset == null)
-            {
-                return;
-            }
 
             _isLoadingScene = true;
 
-            StartCoroutine(LoadSceneSafely(sceneAsset.name));
+            StartCoroutine(LoadSceneSafely(sceneName));
         }
         
         private IEnumerator LoadSceneSafely(string sceneName)
         {
-            // Wait for physics to fully finish
-            yield return new WaitForFixedUpdate();
-
-            // Wait until end of frame (render + destruction done)
-            yield return new WaitForEndOfFrame();
-
-            // Extra safety frame
+            // wait one frame (NOT affected by timeScale)
             yield return null;
+
+            // wait end of frame (also safe)
+            yield return new WaitForEndOfFrame();
 
             SceneManager.LoadScene(sceneName);
         }
@@ -140,14 +123,14 @@ namespace Managers
         {
             var result = new List<string>();
 
-            if (mainMenuScene != null)
-                result.Add(mainMenuScene.name);
+            if (!string.IsNullOrEmpty(mainMenuScene))
+                result.Add(mainMenuScene);
 
-            if (winMenuScene != null)
-                result.Add(winMenuScene.name);
+            if (!string.IsNullOrEmpty(winMenuScene))
+                result.Add(winMenuScene);
 
-            if (gameOverMenuScene != null)
-                result.Add(gameOverMenuScene.name);
+            if (!string.IsNullOrEmpty(gameOverMenuScene))
+                result.Add(gameOverMenuScene);
 
             return result;
         }

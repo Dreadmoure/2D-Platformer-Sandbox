@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Managers;
 using UnityEngine;
@@ -32,9 +33,13 @@ namespace Player
     
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // reset state every scene load
+            _currentPlayer = null;
+            _spawnPoint = null;
+
             if (!IsGameplayScene(scene.name))
                 return;
-        
+
             SpawnPlayer();
         }
     
@@ -45,14 +50,27 @@ namespace Player
     
         private void SpawnPlayer()
         {
+            // Check if a player already exists in the scene
+            GameObject existingPlayer = GameObject.FindGameObjectWithTag("Player");
+
+            if (existingPlayer != null)
+            {
+                _currentPlayer = existingPlayer;
+                return;
+            }
+
             if (_spawnPoint == null)
             {
                 GameObject sp = GameObject.FindGameObjectWithTag("PlayerSpawnPoint");
-                if (sp != null)
+                if (sp != null && sp.transform.childCount > 0)
                 {
                     _spawnPoint = sp.transform.GetChild(0);
                 }
-                    
+                else
+                {
+                    Debug.LogError("Spawn point not found!");
+                    return;
+                }
             }
 
             _currentPlayer = Instantiate(playerPrefab, _spawnPoint.position, _spawnPoint.rotation);
@@ -60,7 +78,6 @@ namespace Player
 
         public void HandlePlayerDeath()
         {
-            Debug.Log("HandlePlayerDeath FRAME: " + Time.frameCount);
             string sceneName = SceneManager.GetActiveScene().name;
 
             if (!IsGameplayScene(sceneName))
@@ -87,6 +104,14 @@ namespace Player
         {
             _playerManager.ResetHealth();
 
+            StartCoroutine(RespawnNextFrame());
+        }
+        
+        private IEnumerator RespawnNextFrame()
+        {
+            // ✅ wait until old player is actually destroyed
+            yield return null;
+
             SpawnPlayer();
         }
 
@@ -94,21 +119,8 @@ namespace Player
         {
             if (_currentPlayer != null)
                 Destroy(_currentPlayer);
-
-            Debug.Log("Game over");
+            
             ManagerRoot.Instance.GameSceneManager.LoadGameOverMenuScene();
-        }
-        
-        public void DisablePlayerColliders()
-        {
-            if (_currentPlayer == null) return;
-
-            var colliders = _currentPlayer.GetComponentsInChildren<Collider2D>();
-
-            foreach (var col in colliders)
-            {
-                col.enabled = false;
-            }
         }
     }
 }

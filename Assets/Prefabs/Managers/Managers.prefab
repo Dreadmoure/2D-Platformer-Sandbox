@@ -431,12 +431,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5954517dfdf029448858db434d89c5ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneManager
-  mainMenuScene: {fileID: 102900000, guid: 1321e77136249d048bc2a9d8897bbf28, type: 3}
+  mainMenuScene: MainMenu Scene
   gameScenes:
-  - {fileID: 102900000, guid: 8c9cfa26abfee488c85f1582747f6a02, type: 3}
-  - {fileID: 102900000, guid: c7cc669e61cb3a34883d4f3745f424cc, type: 3}
-  winMenuScene: {fileID: 102900000, guid: 4c08fada9a4287048a69b5e0472bda4d, type: 3}
-  gameOverMenuScene: {fileID: 102900000, guid: fe69ffa5c9b736d4c982d442f79f9dd0, type: 3}
+  - Scene 1
+  - Scene 2
+  winMenuScene: Win Scene
+  gameOverMenuScene: Gameover Scene
 --- !u!1 &4039156489378449787
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ namespace Managers
 {
     public class PlayerManager : MonoBehaviour
     {
+        [Tooltip("How much max health the player can have")]
         [SerializeField] private float maxHealth = 100f;
         
         [Tooltip("How many lives the player starts with")]
@@ -36,15 +37,11 @@ namespace Managers
 
         public void TakeDamage(float value)
         {
-            Debug.Log("TakeDamage FRAME: " + Time.frameCount);
-            
             // HARD LOCK (prevents ANY re-entry)
             if (_isDead || _deathTriggered)
                 return;
             
             CurrentHealth -= value;
-            
-            Debug.Log("B - After damage calc");
             
             if (CurrentHealth > 0)
             {
@@ -59,8 +56,6 @@ namespace Managers
 
             CurrentHealth = 0;
             LivesCount--;
-
-            Debug.Log("D - Death triggered");
 
             ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.TakeDamage);
 
