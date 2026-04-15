@@ -8,20 +8,29 @@ namespace Player
     public class PlayerController : MonoBehaviour
     {
         [Header("Movement")]
+        [Tooltip("Speed at which the Player moves")]
         [SerializeField] private float speed = 5f;
         
         [Header("Jump")]
+        [Tooltip("How much velocity the Player jumps with")]
         [SerializeField] private float jumpForce = 5f;
+        [Tooltip("Reduces upward velocity when releasing jump early. Lower values = shorter jumps.")]
         [SerializeField, Range(0f, 0.99f)] private float jumpCutMultiplier = 0.1f; // lower = shorter tap jump
+        [Tooltip("Multiplies gravity while falling to make descents faster and less floaty.")]
         [SerializeField] private float fallGravityMultiplier = 2f;
         
         [Header("Double Jump")]
+        [Tooltip("Determines if the Player is able to use Double jump")]
         [SerializeField] private bool canDoubleJump = true;
+        [Tooltip("How much velocity the Player double jumps with")]
         [SerializeField] private float doubleJumpForce = 7f;
+        [Tooltip("Reduces upward velocity when releasing double jump early. Lower values = shorter double jumps.")]
         [SerializeField, Range(0f, 0.99f)] private float doubleJumpCutMultiplier = 0.2f;
         
         [Header("Jump Timing")]
+        [Tooltip("Time after leaving ground where a jump is still allowed (forgiveness window).")]
         [SerializeField, Range(0f, 0.5f)] private float coyoteTime = 0.15f; // seconds after leaving ground
+        [Tooltip("Time to buffer a jump input before landing so it triggers on contact.")]
         [SerializeField, Range(0f, 0.5f)] private float jumpBufferTime = 0.1f; // seconds before landing
         
         [Header("Ground Detection")]
