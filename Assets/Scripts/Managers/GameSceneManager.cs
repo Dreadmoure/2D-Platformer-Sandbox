@@ -9,9 +9,13 @@ namespace Managers
     public class GameSceneManager : MonoBehaviour
     {
         [Header("Scene Names (must match Build Settings)")]
+        [Tooltip("Name of the Main Menu Scene")]
         [SerializeField] private string mainMenuScene;
+        [Tooltip("List of game scene names")]
         [SerializeField] private List<string> gameScenes;
+        [Tooltip("Name of the Win Menu Scene")]
         [SerializeField] private string winMenuScene;
+        [Tooltip("Name of the Game Over Menu Scene")]
         [SerializeField] private string gameOverMenuScene;
 
         private int _currentSceneIndex;

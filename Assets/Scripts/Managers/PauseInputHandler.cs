@@ -6,6 +6,7 @@ namespace Managers
 {
     public class PauseInputHandler : MonoBehaviour
     {
+        [Tooltip("The Input Action that is used to Pause the game")]
         [SerializeField] private InputActionReference pauseAction;
         
         private InputTracker _inputTracker;

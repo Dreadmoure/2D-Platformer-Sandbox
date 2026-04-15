@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8849093567983714401}
   - component: {fileID: 526661519333818559}
-  - component: {fileID: 25317231382509441}
   - component: {fileID: 4066219700654552460}
+  - component: {fileID: 25317231382509441}
   m_Layer: 0
   m_Name: Medpack
   m_TagString: Untagged
@@ -93,19 +93,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &25317231382509441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7194918676511742347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86c69d8ea84fdd44a88f086574ef31ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MedPack
-  healAmount: 100
 --- !u!61 &4066219700654552460
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -152,3 +139,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &25317231382509441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7194918676511742347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c69d8ea84fdd44a88f086574ef31ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MedPack
+  healAmount: 100

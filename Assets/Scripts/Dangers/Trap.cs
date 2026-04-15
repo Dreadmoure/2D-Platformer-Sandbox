@@ -7,13 +7,14 @@ namespace Dangers
     {
         [Tooltip("The amount of damage done to the player")]
         [SerializeField] private float damage = 50f;
+        [Tooltip("Determines if the trap is active and can trigger if the Player collides with it")]
         [SerializeField] private bool isActive = true;
         
-        Animator animator;
+        Animator _animator;
 
         private void Start()
         {
-            animator = GetComponent<Animator>();
+            _animator = GetComponent<Animator>();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -26,7 +27,7 @@ namespace Dangers
                     
                     ManagerRoot.Instance.GameAudioManager.PlaySfx(GameAudioManager.SfxType.Trap);
                     
-                    animator.SetTrigger("TrapTriggered");
+                    _animator.SetTrigger("TrapTriggered");
                     
                     ManagerRoot.Instance.PlayerManager.TakeDamage(damage);
                 }

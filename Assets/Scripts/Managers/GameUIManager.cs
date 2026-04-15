@@ -8,9 +8,13 @@ namespace Managers
 {
     public class GameUIManager : MonoBehaviour
     {
+        [Tooltip("GameObject that holds the Main Menu UI Document")]
         [SerializeField] private GameObject mainMenuUI;
+        [Tooltip("GameObject that holds the Game Scene UI Document")]
         [SerializeField] private GameObject gameSceneUI;
+        [Tooltip("GameObject that holds the Win Menu UI Document")]
         [SerializeField] private GameObject winMenuUI;
+        [Tooltip("GameObject that holds the Game Over Menu UI Document")]
         [SerializeField] private GameObject gameOverMenuUI;
         
         private Dictionary<string, GameObject> _sceneToUIMap;

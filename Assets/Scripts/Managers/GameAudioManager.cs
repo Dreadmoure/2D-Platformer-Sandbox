@@ -8,12 +8,17 @@ namespace Managers
     public class GameAudioManager : MonoBehaviour
     {
         [Header("Audio Sources")]
+        [Tooltip("GameObject that handles music")]
         [SerializeField] private AudioSource musicSource;
+        [Tooltip("GameObject that handles sfx")]
         [SerializeField] private AudioSource sfxSource;
         
         [Header("Volume")]
+        [Tooltip("The overall volume")]
         [Range(0f, 1f)] public float masterVolume = 1f;
+        [Tooltip("The music volume")]
         [Range(0f, 1f)] public float musicVolume = 1f;
+        [Tooltip("The sfx volume")]
         [Range(0f, 1f)] public float sfxVolume = 1f;
 
         public enum MusicType
@@ -40,9 +45,11 @@ namespace Managers
         }
         
         [Header("Music Clips")]
+        [Tooltip("List of music clips")]
         [SerializeField] private List<MusicTypeClipPair> musicClipsList;
 
         [Header("SFX Clips")]
+        [Tooltip("List of sfx clips")]
         [SerializeField] private List<SfxTypeClipPair> sfxClipsList;
         
         // Internal dictionaries
@@ -55,16 +62,22 @@ namespace Managers
         [System.Serializable]
         public class MusicTypeClipPair
         {
+            [Tooltip("Determines which type of music")]
             public MusicType type;
+            [Tooltip("Assign the music file")]
             public AudioClip clip;
+            [Tooltip("Volume of the individual music clip")]
             [Range(0f, 1f)] public float volume = 1;
         }
         
         [System.Serializable]
         public class SfxTypeClipPair
         {
+            [Tooltip("Determines which type of sfx")]
             public SfxType type;
+            [Tooltip("Assign the sfx file")]
             public AudioClip clip;
+            [Tooltip("Volume of the individual sfx clip")]
             [Range(0f, 2f)] public float volume = 1;
         }
         

@@ -8,6 +8,7 @@ namespace Player
 {
     public class DeathFlowManager : MonoBehaviour
     {
+        [Tooltip("The Player Prefab used to instantiate the Player")]
         [SerializeField] private GameObject playerPrefab;
 
         private PlayerManager _playerManager;

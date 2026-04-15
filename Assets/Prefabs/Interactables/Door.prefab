@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6167414452135963677}
   - component: {fileID: 990912160839845159}
-  - component: {fileID: 6590327570696150837}
   - component: {fileID: 2516031687990084730}
+  - component: {fileID: 6590327570696150837}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -93,18 +93,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &6590327570696150837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1148981010975554552}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b723aacf5bdea7944a4a6c8c852450da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Door
 --- !u!61 &2516031687990084730
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -151,3 +139,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.41, y: 0.7629092}
   m_EdgeRadius: 0
+--- !u!114 &6590327570696150837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1148981010975554552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b723aacf5bdea7944a4a6c8c852450da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Door

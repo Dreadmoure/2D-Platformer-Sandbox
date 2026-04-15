@@ -7,6 +7,7 @@ namespace Collectables
 {
     public class Collectable : MonoBehaviour
     {
+        [Tooltip("Value of the individual collectable")]
         [SerializeField] private int collectableValue = 1;
 
         private void OnTriggerEnter2D(Collider2D other)
