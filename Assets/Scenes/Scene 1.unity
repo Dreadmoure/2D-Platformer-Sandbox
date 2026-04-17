@@ -7759,13 +7759,21 @@ PrefabInstance:
       propertyPath: healAmount
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 526661519333818559, guid: cab78ce8c48928e45af35bda6f665d14, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 526661519333818559, guid: cab78ce8c48928e45af35bda6f665d14, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1872155623
+      objectReference: {fileID: 0}
     - target: {fileID: 7194918676511742347, guid: cab78ce8c48928e45af35bda6f665d14, type: 3}
       propertyPath: m_Name
       value: Medpack
       objectReference: {fileID: 0}
     - target: {fileID: 8849093567983714401, guid: cab78ce8c48928e45af35bda6f665d14, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.4284823
+      value: -3.7
       objectReference: {fileID: 0}
     - target: {fileID: 8849093567983714401, guid: cab78ce8c48928e45af35bda6f665d14, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8031,6 +8039,14 @@ PrefabInstance:
     - target: {fileID: 1227371929819644556, guid: 0ccfc6043fa2d4645a709a12f0856248, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788641559454446720, guid: 0ccfc6043fa2d4645a709a12f0856248, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788641559454446720, guid: 0ccfc6043fa2d4645a709a12f0856248, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1872155623
       objectReference: {fileID: 0}
     - target: {fileID: 6097059665309846068, guid: 0ccfc6043fa2d4645a709a12f0856248, type: 3}
       propertyPath: m_Name
